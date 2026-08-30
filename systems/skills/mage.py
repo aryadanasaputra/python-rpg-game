@@ -1,5 +1,5 @@
 from .skill import Skill
-from systems.effects.effect import BURN, HEAL
+from systems.effects.effect import BURN, REGEN
 
 IGNITE = Skill(
     "Ignite",
@@ -20,5 +20,5 @@ IGNITE = Skill(
 HEALING = Skill(
     "Healing",
     mana_cost=15,
-    effect=HEAL
+    effect=REGEN
 )
