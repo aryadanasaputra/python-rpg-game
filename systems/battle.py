@@ -106,6 +106,25 @@ class Battle:
         if drop:
             self.players[0].add_item(drop)
 
+    def get_effect_target(self, caster, skill):
+        target_type  = skill.effect_target
+
+        if target_type == "self":
+            return [caster]
+        elif target_type == "all_allies":
+            return self.alive_players()
+        elif target_type == "ally":
+            target = self.choose_player()
+            if target:
+                return [target]
+        elif target_type == "all_enemies":
+            return self.alive_monsters()
+        elif target_type == "enemy":
+            target = self.choose_target()
+            return [target]
+
+        return []
+
     def player_turn(self, player_character):
         while True:
             print("\n======================")

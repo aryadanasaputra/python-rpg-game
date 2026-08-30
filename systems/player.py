@@ -199,16 +199,24 @@ class Character:
 
         if skill.effect is not None:
             effect = skill.effect.copy()
-
-            if skill.effect_target == "self":
-                self.add_effect(effect)
-            else:
-                target.add_effect(effect)
-
-            if effect.name.lower() == "Regen":
+            if effect.name.lower() == "regen":
                 effect.health_bonus = int(self.max_health * 0.05)
 
+            if skill.effect_target == "self":
+                self.apply_skill_effect(skill, self)
+            else:
+                self.apply_skill_effect(skill, target)
+
         return True
+
+    def apply_skill_effect(self, skill, target):
+        if skill.effect is None:
+            return
+        effect = skill.effect.copy()
+        if effect.name.lower() == "regen":
+            effect.health_bonus = int(target.max_health * 0.05)
+
+        target.add_effect(effect)
 
     # INVENTORY
     def add_item(self, item):
