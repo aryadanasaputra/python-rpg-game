@@ -1,12 +1,14 @@
 class StatusEffect:
-    def __init__(self, name, duration, damage=0, defense_bonus=0, attack_bonus=0, max_mana_bonus=0, max_health_bonus=0, ):
+    def __init__(self, name, duration, damage=0, defense_bonus=0, attack_bonus=0, health_bonus=0, mana_bonus=0, max_health_bonus=0, max_mana_bonus=0):
         self.name = name
         self.duration = duration
         self.damage = damage
         self.defense_bonus = defense_bonus
         self.attack_bonus = attack_bonus
-        self.max_mana_bonus = max_mana_bonus
+        self.health_bonus = health_bonus
+        self.mana_bonus = mana_bonus
         self.max_health_bonus = max_health_bonus
+        self.max_mana_bonus = max_mana_bonus
 
     def copy(self):
         return StatusEffect(
@@ -15,6 +17,8 @@ class StatusEffect:
             self.damage,
             self.defense_bonus,
             self.attack_bonus,
+            self.health_bonus,
+            self.mana_bonus,
             self.max_health_bonus,
             self.max_mana_bonus
         )
@@ -23,3 +27,4 @@ BUFF = StatusEffect("Buff", duration=3, attack_bonus=5, max_mana_bonus=100)
 WEAKNES = StatusEffect("Weaknes", duration=2, attack_bonus=-2, defense_bonus=-3, max_mana_bonus=-30)
 BERSERK = StatusEffect("Berserk", duration=2, attack_bonus=8, defense_bonus=-4)
 BURN = StatusEffect("Burning", duration=3, damage=3, defense_bonus=-3)
+HEAL = StatusEffect("Heal", duration=2, health_bonus=5)
