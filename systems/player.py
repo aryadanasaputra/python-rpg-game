@@ -205,6 +205,9 @@ class Character:
             else:
                 target.add_effect(effect)
 
+            if effect.name.lower() == "Regen":
+                effect.health_bonus = int(self.max_health * 0.05)
+
         return True
 
     # INVENTORY
