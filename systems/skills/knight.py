@@ -30,6 +30,7 @@ HEAL = Skill(
 BERSERK = Skill(
     "Berserk",
     mana_cost=12,
+    damage=10,
     effect=BERSERK
 )
 
