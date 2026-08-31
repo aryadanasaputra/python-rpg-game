@@ -107,7 +107,7 @@ class Battle:
             self.players[0].add_item(drop)
 
     def get_effect_target(self, caster, skill):
-        target_type  = skill.effect_target
+        target_type  = skill.target_type
 
         if target_type == "self":
             return [caster]
@@ -173,27 +173,19 @@ class Battle:
                     continue
                 
                 index = int(skill_choice) - 1
-                if 0 <= index < len(player_character.skills):
-                    selected_skill = player_character.skills[index]
-                    success = False
-                    if selected_skill.damage > 0 or selected_skill.effect_target == "enemy":
-                        target = self.choose_target()
-                        if target is None:
-                            continue
-                        success = player_character.use_skill(selected_skill, target)
-                        if not target.life:
-                            self.give_reward(target, self.players)
-                    elif selected_skill.defense > 0:
-                        success = player_character.use_skill(selected_skill)
-                    elif selected_skill.heal > 0:
-                        success = player_character.use_skill(selected_skill)
-                    else:
-                        print("This skill has no effect.")
-                    if success:
-                        return "used"
+                if index < 0 or index >= len(player_character.skills):
+                    print("Invalid skill choice")
                     continue
-                print("Invalid skill choice")
-                continue
+                selected_skill = player_character.skills[index]
+                targets = self.get_effect_target(player_character ,selected_skill)
+                if not targets:
+                    continue
+                success = player_character.use_skill(selected_skill, targets)
+                if success:
+                    for target in targets:
+                        if target in self.monsters and not target.life:
+                            self.give_reward(target, player_character)
+                    return "used"
 
             elif choice == "3":
                 self.clear_screen()

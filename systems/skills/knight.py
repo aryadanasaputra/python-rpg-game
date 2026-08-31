@@ -1,22 +1,24 @@
 from .skill import Skill
-from systems.effects.effect import BUFF, POISON, WEAKNES, BERSERK
+from systems.effects.effect import WEAKNES, BERSERK, SHIELD
 
 WIND_SWING = Skill(
     "Wind Swing",
     mana_cost=10,
-    damage=30
+    damage=30,
+    target_type="enemy"
 )
 
 SHIELD_BASH = Skill(
     "Shield Bash",
     mana_cost=15,
-    damage=20
+    damage=20,
+    target_type="enemy"
 )
 
 RISING_SHIELD = Skill(
     "Rising Shield",
     mana_cost=10,
-    defense=10,
+    effect=SHIELD
 )
 
 HEAL = Skill(
@@ -28,14 +30,12 @@ HEAL = Skill(
 BERSERK = Skill(
     "Berserk",
     mana_cost=12,
-    damage=5,
-    effect=BERSERK,
-    effect_target="self"
+    effect=BERSERK
 )
 
 INTIMIDATE = Skill(
     "Intimidate",
     mana_cost=8,
     effect=WEAKNES,
-    effect_target="enemy"
+    target_type="enemy"
 )

@@ -6,19 +6,20 @@ IGNITE = Skill(
     mana_cost=10,
     damage=10,
     effect=BURN,
-    effect_target="enemy"
+    target_type="enemy"
 )
 
-IGNITE = Skill(
-    "Ignite",
-    mana_cost=10,
+FLAME_STRIKE = Skill(
+    "Flame Strike",
+    mana_cost=20,
     damage=10,
     effect=BURN,
-    effect_target="enemy"
+    target_type="all_enemies"
 )
 
 HEALING = Skill(
     "Healing",
     mana_cost=15,
-    effect=REGEN
+    effect=REGEN,
+    target_type="ally"
 )
