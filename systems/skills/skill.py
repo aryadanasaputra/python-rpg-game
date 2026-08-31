@@ -1,5 +1,5 @@
 class Skill:
-    def __init__(self, name, mana_cost, damage=0, heal=0, defense=0, effect=None, target_type="self"):
+    def __init__(self, name, mana_cost, damage=0, heal=0, defense=0, effect=None, target_type="self", effect_target=None):
         self.name  = name
         self.mana_cost = mana_cost
         self.damage =  damage
@@ -7,4 +7,5 @@ class Skill:
         self.defense = defense
         self.effect = effect
         self.target_type = target_type
+        self.effect_target = effect_target
         
