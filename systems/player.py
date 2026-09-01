@@ -180,8 +180,8 @@ class Character:
         damage_targets = damage_targets if damage_targets is not None else []
         effect_targets = effect_targets if effect_targets is not None else []
             
-        print(f"{self.name} using skill name {skill.name}")
         self.mana -= skill.mana_cost
+        print(f"{self.name} using skill name {skill.name}")
 
         if skill.damage > 0:
             roll = random.randint(1, 20)
@@ -389,12 +389,12 @@ class Character:
         if effect.max_health_bonus > 0:
             self.health = max(self.health, int(self.max_health * 0.9))
         elif effect.max_health_bonus < 0:
-            self.health = max(self.health, self.max_health)
+            self.health = min(self.health, self.max_health)
 
         if effect.max_mana_bonus > 0:
             self.mana = max(self.mana, int(self.max_mana * 0.9))
         elif effect.max_mana_bonus < 0:
-            self.mana = max(self.mana, self.max_mana)
+            self.mana = min(self.mana, self.max_mana)
 
     def remove_effect_stat(self, effect):
         self.attack -= effect.attack_bonus

@@ -22,6 +22,8 @@ FLAME_STRIKE = Skill(
 HEALING = Skill(
     "Healing",
     mana_cost=15,
+    heal=15,
     effect=REGEN,
+    target_type="ally",
     effect_target="ally"
 )
