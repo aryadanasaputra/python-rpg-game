@@ -28,3 +28,4 @@ WEAKNES = StatusEffect("Weaknes", duration=2, attack_bonus=-2, defense_bonus=-3,
 BERSERK = StatusEffect("Berserk", duration=2, attack_bonus=8, defense_bonus=-4)
 BURN = StatusEffect("Burning", duration=3, damage=3, defense_bonus=-3)
 REGEN = StatusEffect("Regen", duration=2)
+BLEEDING = StatusEffect("Bleeding", duration=3, damage=4, defense_bonus=-2)
