@@ -370,6 +370,11 @@ class Character:
 
     # COMBAT EFFECT
     def add_effect(self, effect):
+        for existing_effect in self.effects:
+            if existing_effect.name == effect.name:
+                existing_effect.duration += effect.duration
+                print(f"{self.name}'s {effect.name} duration extended by {effect.duration} turns.")
+                return
         self.effects.append(effect)
         self.apply_effect_stat(effect)
         print(f"{self.name} is effected by {effect.name}")
