@@ -173,9 +173,12 @@ class Character:
         self.skills.append(skill)
         print(f"{self.name} learned {skill.name}")
 
-    def use_skill(self, skill, targets=None):
+    def use_skill(self, skill, damage_targets=None, effect_targets=None):
         if not self.can_use_skill(skill):
             return False
+
+        damage_targets = damage_targets if damage_targets is not None else []
+        effect_targets = effect_targets if effect_targets is not None else []
             
         print(f"{self.name} using skill name {skill.name}")
         self.mana -= skill.mana_cost
@@ -184,7 +187,7 @@ class Character:
             roll = random.randint(1, 20)
             attack_value = self.attack + skill.damage + roll
             print(f"{self.name} rolls a {roll} for skill, total value: {attack_value}.")
-            for target in targets:
+            for target in damage_targets:
                 self.resolve_attack(target, attack_value, roll)
 
         if skill.defense > 0:
@@ -192,15 +195,15 @@ class Character:
             print(f"{self.name} increases defense by {skill.defense} (now {self.defense}).")
 
         if skill.heal > 0:
-            for target in targets:
+            for target in effect_targets:
                 healing = skill.heal
-                old_hp = self.health
-                self.health = min(self.max_health, self.health + healing)
-                actual_healed = self.health - old_hp
-                print(f"{self.name} heals {actual_healed} HP (now {self.health}/{self.max_health}).")
+                old_hp = target.health
+                target.health = min(target.max_health, target.health + healing)
+                actual_healed = target.health - old_hp
+                print(f"{self.name} heals {actual_healed} HP (now {target.health}/{target.max_health}).")
 
         if skill.effect is not None:
-            for target in targets:
+            for target in effect_targets:
                 effect = skill.effect.copy()
                 if effect.name.lower() == "regen":
                     effect.health_bonus = int(target.max_health * 0.05)
@@ -427,6 +430,5 @@ class Character:
 
         for effect in (expired):
             self.remove_effect_stat(effect)
-            print(f"{self.name}'s {effect.name.lower()} has expired.")
 
 
