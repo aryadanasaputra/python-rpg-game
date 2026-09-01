@@ -106,10 +106,17 @@ class Battle:
         if drop:
             self.players[0].add_item(drop)
 
-    def get_damage_target(self, skill):
-        target_type = skill.target_type
+    def get_target(self, caster, target_type):
 
-        if target_type == "all_enemies":
+        if target_type == "self":
+            return [caster]
+        elif target_type == "all_allies":
+            return self.alive_players()
+        elif target_type == "ally":
+            target = self.choose_player()
+            if target:
+                return [target]
+        elif target_type == "all_enemies":
             return self.alive_monsters()
         elif target_type == "enemy":
             target = self.choose_target()
@@ -193,24 +200,23 @@ class Battle:
                     continue
                 selected_skill = player_character.skills[index]
 
-                damage_targets = []
-                effect_targets = []
-                if selected_skill.damage > 0:
-                    damage_targets = self.get_damage_target(selected_skill)
+                targets = self.get_target(player_character, selected_skill.target_type)
 
-                if selected_skill.effect is not None:
-                    if selected_skill.effect_target == selected_skill.target_type:
-                        effect_targets = damage_targets
-                    else:
-                        effect_targets = self.get_effect_target(player_character, selected_skill)
-
-                if not damage_targets and not effect_targets:
+                if not targets:
                     print("No valid targets for this skill.")
                     continue
-                success = player_character.use_skill(selected_skill, damage_targets, effect_targets)
+
+                effect_targets = []
+                if selected_skill.effect is not None:
+                    if selected_skill.effect_target == selected_skill.target_type:
+                        effect_targets = targets
+                    else:
+                        effect_targets = self.get_target(player_character, selected_skill.effect_target)
+
+                success = player_character.use_skill(selected_skill, targets, effect_targets)
                 print(f"DEBUG skill_choice = {skill_choice!r}")
                 if success:
-                    for target in damage_targets + effect_targets:
+                    for target in targets:
                         if target in self.monsters and not target.life:
                             self.give_reward(target, player_character)
                     return "used"

@@ -1,5 +1,27 @@
 from .skill import Skill
-from systems.effects.effect import WEAKNES, BERSERK, SHIELD, BLEEDING
+from systems.effects.effect import (
+    POISON,
+    SHIELD,
+    WEAKNESS,
+    BERSERK,
+    BURN,
+    REGEN,
+    BLEEDING,
+    MIGHT,
+    FORTIFY,
+    ARCANE_POWER,
+    HASTE,
+    VULNERABLE,
+    EXHAUSTED,
+    FRAGILE,
+    GREATER_REGEN,
+    MANA_REGEN,
+    BLOOD_RAGE,
+    STONE_SKIN,
+    TOXIC_ARMOR,
+    MANA_BOOST,
+    VITALITY
+)
 
 WIND_SWING = Skill(
     "Wind Swing",
@@ -44,6 +66,6 @@ BERSERK = Skill(
 INTIMIDATE = Skill(
     "Intimidate",
     mana_cost=8,
-    effect=WEAKNES,
+    effect=WEAKNESS,
     target_type="enemy"
 )

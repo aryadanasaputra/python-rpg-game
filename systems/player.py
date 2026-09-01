@@ -173,11 +173,10 @@ class Character:
         self.skills.append(skill)
         print(f"{self.name} learned {skill.name}")
 
-    def use_skill(self, skill, damage_targets=None, effect_targets=None):
+    def use_skill(self, skill, targets, effect_targets=None):
         if not self.can_use_skill(skill):
             return False
 
-        damage_targets = damage_targets if damage_targets is not None else []
         effect_targets = effect_targets if effect_targets is not None else []
             
         self.mana -= skill.mana_cost
@@ -187,15 +186,16 @@ class Character:
             roll = random.randint(1, 20)
             attack_value = self.attack + skill.damage + roll
             print(f"{self.name} rolls a {roll} for skill, total value: {attack_value}.")
-            for target in damage_targets:
+            for target in targets:
                 self.resolve_attack(target, attack_value, roll)
 
         if skill.defense > 0:
-            self.defense += skill.defense
-            print(f"{self.name} increases defense by {skill.defense} (now {self.defense}).")
+            for target in targets:
+                target.defense += skill.defense
+                print(f"{self.name} increases defense by {skill.defense} (now {target.defense}).")
 
         if skill.heal > 0:
-            for target in effect_targets:
+            for target in targets:
                 healing = skill.heal
                 old_hp = target.health
                 target.health = min(target.max_health, target.health + healing)
@@ -204,10 +204,12 @@ class Character:
 
         if skill.effect is not None:
             for target in effect_targets:
+                if not target.life:
+                    print(f"{target.name} is already dead and cannot be affected by {skill.effect.name}.")
+                    continue
+
                 effect = skill.effect.copy()
-                if effect.name.lower() == "regen":
-                    effect.health_bonus = int(target.max_health * 0.05)
-                    print(f"{self.name} give regen to {target.name}")
+                effect.apply_immediate_effect(target)
                 target.add_effect(effect)
 
         return True
@@ -411,19 +413,7 @@ class Character:
     def process_effect(self):
         expired = []
         for effect in (self.effects):
-            if effect.damage > 0:
-                self.health = max(0, self.health - effect.damage)
-                print(f"{self.name} takes {effect.damage} damage from {effect.name}")
-            if effect.health_bonus > 0:
-                old_health = self.health
-                self.health = min(self.max_health, self.health + effect.health_bonus)
-                restored_health = self.health - old_health
-                print(f"{self.name} retores {restored_health} HP from {effect.name}")
-            if effect.mana_bonus > 0:
-                old_mana = self.mana
-                self.mana = min(self.max_mana, self.mana + effect.mana_bonus)
-                restored_mana = self.mana - old_mana
-                print(f"{self.name} retores {restored_mana} HP from {effect.name}")
+            effect.process(self)
             effect.duration -= 1
             if effect.duration <= 0:
                 expired.append(effect)

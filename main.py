@@ -2,7 +2,7 @@ import systems.player as player
 import systems.monster as monster
 from systems.battle import Battle
 from systems.skills.knight import WIND_SWING, RISING_SHIELD, SHIELD_BASH, HEAL, BERSERK, INTIMIDATE
-from systems.skills.mage import IGNITE, FLAME_STRIKE, HEALING
+from systems.skills.mage import IGNITE, FLAME_STRIKE, HEALING, GREATER_HEALING
 
 from systems.items.item import HEALTH_POTION, MANA_POTION
 from systems.equipments.armor import WOODEN_ARMOR
@@ -32,6 +32,7 @@ p1.add_item(MANA_POTION)
 p2.learn_skill(IGNITE)
 p2.learn_skill(FLAME_STRIKE)
 p2.learn_skill(HEALING)
+p2.learn_skill(GREATER_HEALING)
 
 p2.add_item(HEALTH_POTION)
 p2.add_item(MANA_POTION)
