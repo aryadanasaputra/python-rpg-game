@@ -106,6 +106,19 @@ class Battle:
         if drop:
             self.players[0].add_item(drop)
 
+    def get_damage_target(self, skill):
+        target_type = skill.target_type
+
+        if target_type == "all_enemies":
+            return self.alive_monsters()
+        elif target_type == "enemy":
+            target = self.choose_target()
+            if target is None:
+                return []
+            return [target]
+
+        return []
+
     def get_effect_target(self, caster, skill):
         effect_target  = skill.effect_target
 
@@ -121,6 +134,8 @@ class Battle:
             return self.alive_monsters()
         elif effect_target == "enemy":
             target = self.choose_target()
+            if target is None:
+                return []
             return [target]
 
         return []
@@ -181,17 +196,19 @@ class Battle:
                 damage_targets = []
                 effect_targets = []
                 if selected_skill.damage > 0:
-                    damage_target = self.choose_target()
-                    if damage_target is None:
-                        continue
-                    damage_targets = [damage_target]
+                    damage_targets = self.get_damage_target(selected_skill)
+
                 if selected_skill.effect is not None:
-                    effect_targets = self.get_effect_target(player_character, selected_skill)
+                    if selected_skill.effect_target == selected_skill.target_type:
+                        effect_targets = damage_targets
+                    else:
+                        effect_targets = self.get_effect_target(player_character, selected_skill)
 
                 if not damage_targets and not effect_targets:
                     print("No valid targets for this skill.")
                     continue
                 success = player_character.use_skill(selected_skill, damage_targets, effect_targets)
+                print(f"DEBUG skill_choice = {skill_choice!r}")
                 if success:
                     for target in damage_targets + effect_targets:
                         if target in self.monsters and not target.life:
