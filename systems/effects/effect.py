@@ -37,6 +37,8 @@ class StatusEffect:
             self.restore_mana(target, self.mana_bonus)
 
     def process(self, target):
+        if not target.life:
+            return
         if self.damage > 0:
             print(f"{target.name} takes {self.damage} damage from {self.name}.")
             target.health = max(0, target.health - self.damage)

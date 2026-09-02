@@ -192,7 +192,7 @@ class Character:
             print(f"{self.name} rolls a {roll} for skill, total value: {attack_value}.")
             for target in targets:
                 result = self.resolve_attack(target, attack_value, roll)
-                if result != "miss":
+                if result != "miss" and target.life:
                     successful_targets.append(target)
 
         if skill.defense > 0:
@@ -209,11 +209,13 @@ class Character:
                 actual_healed = target.health - old_hp
                 print(f"{self.name} heals {actual_healed} HP (now {target.health}/{target.max_health}).")
                 successful_targets.append(target)
-
-        self.add_skill_effect(skill, skill.effect, effect_targets)
+        if skill.damage > 0:
+            self.add_skill_effect(skill, successful_targets)
+        else:
+            self.add_skill_effect(skill, effect_targets)
         return True
 
-    def add_skill_effect(self, skill, effect, effect_targets):
+    def add_skill_effect(self, skill, effect_targets):
         if skill.effect is None:
             return
         for target in effect_targets:
@@ -353,15 +355,18 @@ class Character:
         elif roll <= crit:
             damage = max(1, attack_value - target.defense)
             target.health -= damage
+            target.health = max(0, target.health)
             print(f"{self.name} attacks {target.name} and causes {damage} damage.")
             target.status()
             return "hit"
         elif roll > crit:
             damage = max(1, (attack_value - target.defense) * 2)
             target.health -= damage
+            target.health = max(0, target.health)
             print(f"{self.name} lands a critical hit on {target.name} and causes {damage} damage!")
             target.status()
             return "critical"
+        
 
     def attack_target(self, target):
         if not self.can_act():
@@ -399,15 +404,8 @@ class Character:
         self.max_health += effect.max_health_bonus
         self.max_mana += effect.max_mana_bonus
 
-        if effect.max_health_bonus > 0:
-            self.health = max(self.health, int(self.max_health * 0.9))
-        elif effect.max_health_bonus < 0:
-            self.health = min(self.health, self.max_health)
-
-        if effect.max_mana_bonus > 0:
-            self.mana = max(self.mana, int(self.max_mana * 0.9))
-        elif effect.max_mana_bonus < 0:
-            self.mana = min(self.mana, self.max_mana)
+        self.health = min(self.health, self.max_health)
+        self.mana = min(self.mana, self.max_mana)
 
     def remove_effect_stat(self, effect):
         self.attack -= effect.attack_bonus
