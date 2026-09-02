@@ -78,7 +78,7 @@ class Battle:
 
             index = int(choice) - 1
             if index < 0 or index >= len(self.monsters):
-                print("Ivalid target!")
+                print("Invalid target!")
                 continue
 
             target = self.monsters[index]
@@ -100,11 +100,9 @@ class Battle:
         for player in self.players:
             player.gain_experience(exp_each)
             player.add_gold(gold_each)
-
-        drop = monster.get_drop()
-
-        if drop:
-            self.players[0].add_item(drop)
+            drop = monster.get_drop()
+            if drop:
+                player.add_item(drop)
 
     def get_target(self, caster, target_type):
 
@@ -214,7 +212,6 @@ class Battle:
                         effect_targets = self.get_target(player_character, selected_skill.effect_target)
 
                 success = player_character.use_skill(selected_skill, targets, effect_targets)
-                print(f"DEBUG skill_choice = {skill_choice!r}")
                 if success:
                     for target in targets:
                         if target in self.monsters and not target.life:

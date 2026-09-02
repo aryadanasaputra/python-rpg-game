@@ -170,8 +170,11 @@ class Character:
 
     # SKILL
     def learn_skill(self, skill):
-        self.skills.append(skill)
-        print(f"{self.name} learned {skill.name}")
+        if skill not in self.skills:
+            self.skills.append(skill)
+            print(f"{self.name} learned {skill.name}")
+        else:
+            print(f"{self.name} already knows {skill.name}")
 
     def use_skill(self, skill, targets, effect_targets=None):
         if not self.can_use_skill(skill):
@@ -213,15 +216,6 @@ class Character:
                 target.add_effect(effect)
 
         return True
-
-    def apply_skill_effect(self, skill, target):
-        if skill.effect is None:
-            return
-        effect = skill.effect.copy()
-        if effect.name.lower() == "regen":
-            effect.health_bonus = int(target.max_health * 0.05)
-
-        target.add_effect(effect)
 
     # INVENTORY
     def add_item(self, item):
@@ -285,7 +279,7 @@ class Character:
 
         self.health = min(self.health, self.max_health)
         self.mana = min(self.mana, self.max_mana)
-        print(f"{self.name} equiped {equipment.name}")
+        print(f"{self.name} equipped {equipment.name}")
 
     def equip(self, item):
         if item not in self.inventory:
@@ -305,6 +299,8 @@ class Character:
         self.inventory[item] -= 1
         if self.inventory[item] <= 0:
             del self.inventory[item]
+
+        return True
         
 
     def _unequip(self, slot):
@@ -320,7 +316,7 @@ class Character:
         self.health = min(self.health, self.max_health)
         self.mana = min(self.mana, self.max_mana)
         self.add_item(equipment)
-        print(f"{self.name} unequiped {equipment.name}")
+        print(f"{self.name} unequipped {equipment.name}")
         return True
 
     def equip_armor(self, armor):
