@@ -181,6 +181,7 @@ class Character:
             return False
 
         effect_targets = effect_targets if effect_targets is not None else []
+        successful_targets = []
             
         self.mana -= skill.mana_cost
         print(f"{self.name} using skill name {skill.name}")
@@ -190,12 +191,15 @@ class Character:
             attack_value = self.attack + skill.damage + roll
             print(f"{self.name} rolls a {roll} for skill, total value: {attack_value}.")
             for target in targets:
-                self.resolve_attack(target, attack_value, roll)
+                result = self.resolve_attack(target, attack_value, roll)
+                if result != "miss":
+                    successful_targets.append(target)
 
         if skill.defense > 0:
             for target in targets:
                 target.defense += skill.defense
                 print(f"{self.name} increases defense by {skill.defense} (now {target.defense}).")
+                successful_targets.append(target)
 
         if skill.heal > 0:
             for target in targets:
@@ -204,18 +208,22 @@ class Character:
                 target.health = min(target.max_health, target.health + healing)
                 actual_healed = target.health - old_hp
                 print(f"{self.name} heals {actual_healed} HP (now {target.health}/{target.max_health}).")
+                successful_targets.append(target)
 
-        if skill.effect is not None:
-            for target in effect_targets:
-                if not target.life:
-                    print(f"{target.name} is already dead and cannot be affected by {skill.effect.name}.")
-                    continue
-
-                effect = skill.effect.copy()
-                effect.apply_immediate_effect(target)
-                target.add_effect(effect)
-
+        self.add_skill_effect(skill, skill.effect, effect_targets)
         return True
+
+    def add_skill_effect(self, skill, effect, effect_targets):
+        if skill.effect is None:
+            return
+        for target in effect_targets:
+            if not target.life:
+                print(f"{target.name} is already dead and cannot be affected by {skill.effect.name}.")
+                continue
+
+            effect = skill.effect.copy()
+            effect.apply_immediate_effect(target)
+            target.add_effect(effect)
 
     # INVENTORY
     def add_item(self, item):
@@ -341,23 +349,25 @@ class Character:
     def resolve_attack(self, target, attack_value, roll, miss=4, crit=18):
         if roll < miss:
             print(f"{self.name}'s attack missed {target.name}!")
-            return
+            return "miss"
         elif roll <= crit:
             damage = max(1, attack_value - target.defense)
             target.health -= damage
             print(f"{self.name} attacks {target.name} and causes {damage} damage.")
             target.status()
+            return "hit"
         elif roll > crit:
             damage = max(1, (attack_value - target.defense) * 2)
             target.health -= damage
             print(f"{self.name} lands a critical hit on {target.name} and causes {damage} damage!")
             target.status()
+            return "critical"
 
     def attack_target(self, target):
         if not self.can_act():
-            return
+            return False
         if not self.can_target(target):
-            return
+            return False
         roll = random.randint(1, 20)
         attack_value = self.attack + roll
         print(f"{self.name} rolls a {roll} for attack, total attack value: {attack_value}.")
