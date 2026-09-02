@@ -146,9 +146,7 @@ class Monster:
     def process_effect(self):
         expired = []
         for effect in (self.effects):
-            if effect.damage > 0:
-                print(f"{self.name} takes {effect.damage} damage from {effect.name}")
-                self.health = max(0, self.health - effect.damage)
+            effect.process(self)
             effect.duration -= 1
             if effect.duration <= 0:
                 expired.append(effect)
