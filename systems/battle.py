@@ -5,8 +5,8 @@ from systems.items.item import Item
 from systems.equipments.equipment import Equipment
 
 class Battle:
-    def __init__(self, players, monsters):
-        self.players = players if isinstance(players, list) else [players]
+    def __init__(self, party, monsters):
+        self.party = party
         self.monsters = monsters
         self.round = 1
 
@@ -14,10 +14,10 @@ class Battle:
         os.system("cls" if os.name == "nt" else "clear")
 
     def alive_players(self):
-        return [player for player in self.players if player.life]
+        return [character for character in self.party.characters if character.life]
 
     def show_players(self, players=None):
-        players = self.players if players is None else players
+        players = self.party.characters if players is None else players
         print("====== PARTY ======")
         for i, player in enumerate(players, start=1):
             status = "Alive" if player.life else "Dead"
@@ -90,20 +90,19 @@ class Battle:
 
             return target
 
-    def give_reward(self, monster, player):
+    def give_reward(self, monster):
         if monster.reward_given:
             return
 
         monster.reward_given = True
-        exp_each = monster.experience_reward // len(self.players)
-        gold_each = monster.gold_reward // len(self.players)
+        exp_each = monster.experience_reward // len(self.party.characters)
+        drop = monster.get_drop()
 
-        for player in self.players:
-            player.gain_experience(exp_each)
-            player.add_gold(gold_each)
-            drop = monster.get_drop()
-            if drop:
-                player.add_item(drop)
+        for character in self.party.characters:
+            character.gain_experience(exp_each)
+        self.party.add_gold(monster.gold_reward)
+        if drop:
+            self.party.add_item(drop)
 
     def get_target(self, caster, target_type):
 
@@ -151,10 +150,16 @@ class Battle:
             print("\n======================")
             print("     PLAYER TURN")
             print("======================")
-            print(f"{player_character.name} HP : {player_character.health}/{player_character.max_health}")
-            print(f"{player_character.name} MP : {player_character.mana}/{player_character.max_mana}")
+            print(f"Nama    : {player_character.name} ({player_character.role})\n"
+                  f"HP      : {player_character.health}/{player_character.max_health}\n"
+                  f"MP      : {player_character.mana}/{player_character.max_mana}\n"
+                  f"Level   : {player_character.level}\n"
+                  f"EXP     : {player_character.experience}/{player_character.experience_limit}\n"
+                  f"Attack  : {player_character.attack}\n"
+                  f"Defense : {player_character.defense}")
+            print("======================")
 
-            print("\nChoose action:")
+            print("Choose action:")
             print("1. Attack")
             print("2. Skill")
             print("3. Inventory")
@@ -163,15 +168,15 @@ class Battle:
             print("6. Clear Screen")
             print("\n0. Exit Game")
 
-            choice = input("> ")
+            choice = input("Choose action: ")
 
             if choice == "1":
                 target = self.choose_target()
                 if target is None:
                     continue
                 player_character.attack_target(target)
-                if not target.life:
-                    self.give_reward(target, player_character)
+                if target in self.monsters and not target.life:
+                    self.give_reward(target)
                 return "used"
 
             elif choice == "2":
@@ -216,21 +221,21 @@ class Battle:
                 if success:
                     for target in targets:
                         if target in self.monsters and not target.life:
-                            self.give_reward(target, player_character)
+                            self.give_reward(target)
                     return "used"
 
             elif choice == "3":
                 self.clear_screen()
-                if not player_character.inventory:
+                if not self.party.inventory:
                     print("No item")
 
                 print("======== PLAYER INVENTORY ========")
                 print("Items:")
-                for i, (item, quantity) in enumerate(player_character.inventory.items(), start=1):
+                for i, (item, quantity) in enumerate(self.party.inventory.items(), start=1):
                     if isinstance(item, Item):
                         print(f"{i}. {item.name:<25} x{quantity}")
                 print("\nEquipment:")
-                for i, (item, quantity) in enumerate(player_character.inventory.items(), start=1):
+                for i, (item, quantity) in enumerate(self.party.inventory.items(), start=1):
                     if isinstance(item, Equipment):
                         print(f"{i}. {item.name:<25} x{quantity}")
                 print("\nCurrent Equipment:")
@@ -248,13 +253,13 @@ class Battle:
                     continue
 
                 index = int(item_choice) - 1
-                items = list(player_character.inventory.keys())
+                items = list(self.party.inventory.keys())
                 if 0 <= index < len(items):
                     selected_item = items[index]
                     if isinstance(selected_item, Equipment):
-                        success = player_character.equip(selected_item)
+                        success = self.party.equip(player_character, selected_item)
                     else:
-                        success = player_character.use_item(selected_item)
+                        success = self.party.use_item(selected_item, player_character)
                     if success:
                         return "used"
                 else:

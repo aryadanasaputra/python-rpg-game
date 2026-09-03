@@ -268,7 +268,6 @@ class Character:
             
         return True
 
-
     def add_gold(self, amount):
         self.gold += amount
         print(f"{self.name} obtained {amount} Gold!")
@@ -285,7 +284,6 @@ class Character:
 
         if old_equipment:
             self._apply_equipment_stats(old_equipment, -1)
-            self.add_item(old_equipment)
 
         self.equipment[slot] = equipment
         self._apply_equipment_stats(equipment, 1)
@@ -293,6 +291,7 @@ class Character:
         self.health = min(self.health, self.max_health)
         self.mana = min(self.mana, self.max_mana)
         print(f"{self.name} equipped {equipment.name}")
+        return old_equipment
 
     def equip(self, item):
         if item not in self.inventory:
@@ -321,16 +320,15 @@ class Character:
 
         if equipment is None:
             print(f"{self.name} isn't wearing anything in {slot}.")
-            return False
+            return None
 
         self._apply_equipment_stats(equipment, -1)
 
         self.equipment[slot] = None
         self.health = min(self.health, self.max_health)
         self.mana = min(self.mana, self.max_mana)
-        self.add_item(equipment)
         print(f"{self.name} unequipped {equipment.name}")
-        return True
+        return equipment
 
     def equip_armor(self, armor):
         self._equip("armor", armor)

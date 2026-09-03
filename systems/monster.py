@@ -98,6 +98,11 @@ class Monster:
         self.resolve_attack(player, attack_value, roll)
 
     def add_effect(self, effect):
+        for existing_effect in self.effects:
+            if existing_effect.name == effect.name:
+                existing_effect.duration += effect.duration
+                print(f"{self.name}'s {effect.name} duration extended by {effect.duration} turns.")
+                return
         self.effects.append(effect)
         self.apply_effect_stat(effect)
         print(f"{self.name} is effected by {effect.name}")
@@ -111,37 +116,27 @@ class Monster:
             print(f"{self.name} increases maximum mana by {effect.max_mana_bonus}.")
 
     def apply_effect_stat(self, effect):
-        self.attack_power += effect.attack_bonus
+        self.attack += effect.attack_bonus
         self.defense += effect.defense_bonus
         self.max_health += effect.max_health_bonus
         self.max_mana += effect.max_mana_bonus
-        
+
         self.health = min(self.health, self.max_health)
         self.mana = min(self.mana, self.max_mana)
 
-        # Kompkleks apply_effect_stat health dan mana
-
-        # if effect.max_health_bonus > 0:
-        #     self.health = max(self.health, int(self.max_health * 0.9))
-        # elif effect.max_health_bonus < 0:
-        #     self.health = min(self.health, self.max_health)
-
-        # if effect.max_mana_bonus > 0:
-        #     self.mana = max(self.mana, int(self.max_mana * 0.9))
-        # elif effect.max_mana_bonus < 0:
-        #     self.mana = min(self.mana, self.max_mana)
-
     def remove_effect_stat(self, effect):
-        self.attack_power -= effect.attack_bonus
+        self.attack -= effect.attack_bonus
         self.defense -= effect.defense_bonus
         self.max_health -= effect.max_health_bonus
         self.max_mana -= effect.max_mana_bonus
 
         self.health = min(self.health, self.max_health)
         self.mana = min(self.mana, self.max_mana)
+
+    def remove_effect(self, effect):
+        self.remove_effect_stat(effect)
         self.effects.remove(effect)
         print(f"{self.name}'s {effect.name.lower()} has expired.")
-
     
     def process_effect(self):
         expired = []
@@ -152,5 +147,5 @@ class Monster:
                 expired.append(effect)
 
         for effect in (expired):
-            self.remove_effect_stat(effect)
-            print(f"{self.name}'s {effect.name.lower()} has expired.")
+            self.remove_effect(effect)
+
