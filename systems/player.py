@@ -238,33 +238,36 @@ class Character:
     def use_item(self, item):
         if not self.can_act():
             return False
+        
         if item not in self.inventory:
             print(f"{self.name} doesn't have {item.name}.")
             return False
 
-        if item.type.lower() == "potion":
-            print(f"{self.name} uses {item.name}")
-            old_health = self.health
-            old_mana = self.mana
-            self.health = min(self.max_health,self.health + item.health_restore)
-            self.mana = min(self.max_mana,self.mana + item.mana_restore)
-            actual_health = self.health - old_health
-            actual_mana = self.mana - old_mana
-            if item.health_restore > 0:
-                print(f"{self.name} restored {actual_health} HP.")
-            if item.mana_restore > 0:
-                print(f"{self.name} restored {actual_mana} MP.")
-            self.inventory[item] -= 1
-            if self.inventory[item] <= 0:
-                del self.inventory[item]
-            return True
-        elif isinstance(item, Armor):
-            self.equip_armor(item)
-        elif isinstance(item, Weapon):
-            self.equip_weapon(item)
-        elif isinstance(item, Accessory):
-            self.equip_accessory(item)
-        return False
+        if item.type.lower() != "potion":
+            print(f"{item.name} is not a consumable item.")
+            return False
+        
+        print(f"{self.name} uses {item.name}")
+        old_health = self.health
+        old_mana = self.mana
+        self.health = min(self.max_health,self.health + item.health_restore)
+        self.mana = min(self.max_mana,self.mana + item.mana_restore)
+        actual_health = self.health - old_health
+        actual_mana = self.mana - old_mana
+
+        if item.health_restore > 0:
+            print(f"{self.name} restored {actual_health} HP.")
+
+        if item.mana_restore > 0:
+            print(f"{self.name} restored {actual_mana} MP.")
+
+        self.inventory[item] -= 1
+
+        if self.inventory[item] <= 0:
+            del self.inventory[item]
+            
+        return True
+
 
     def add_gold(self, amount):
         self.gold += amount
@@ -355,19 +358,16 @@ class Character:
         elif roll <= crit:
             damage = max(1, attack_value - target.defense)
             target.health -= damage
-            target.health = max(0, target.health)
             print(f"{self.name} attacks {target.name} and causes {damage} damage.")
             target.status()
             return "hit"
         elif roll > crit:
             damage = max(1, (attack_value - target.defense) * 2)
             target.health -= damage
-            target.health = max(0, target.health)
             print(f"{self.name} lands a critical hit on {target.name} and causes {damage} damage!")
             target.status()
             return "critical"
         
-
     def attack_target(self, target):
         if not self.can_act():
             return False
@@ -415,9 +415,11 @@ class Character:
 
         self.health = min(self.health, self.max_health)
         self.mana = min(self.mana, self.max_mana)
+
+    def remove_effect(self, effect):
+        self.remove_effect_stat(effect)
         self.effects.remove(effect)
         print(f"{self.name}'s {effect.name.lower()} has expired.")
-
     
     def process_effect(self):
         expired = []
@@ -428,6 +430,6 @@ class Character:
                 expired.append(effect)
 
         for effect in (expired):
-            self.remove_effect_stat(effect)
+            self.remove_effect(effect)
 
 
