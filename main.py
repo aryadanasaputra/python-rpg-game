@@ -39,7 +39,7 @@ p2.add_item(MANA_POTION)
 p2.add_item(MANA_POTION)
 p2.add_item(MANA_POTION)
 
-# p1.add_item(LEGENDARY_LONG_SWORD)
+p1.add_item(LEGENDARY_LONG_SWORD)
 p1.equip_armor(WOODEN_ARMOR)
 p1.equip_weapon(WOODEN_LONG_SWORD)
 p1.equip_accessory(WOODEN_RING)

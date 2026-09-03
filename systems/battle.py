@@ -1,6 +1,7 @@
 import os
 import sys
 import random
+from systems.items.item import Item
 from systems.equipments.equipment import Equipment
 
 class Battle:
@@ -221,17 +222,24 @@ class Battle:
             elif choice == "3":
                 self.clear_screen()
                 if not player_character.inventory:
-                    print("No item in inventory!")
-                    continue
+                    print("No item")
+
                 print("======== PLAYER INVENTORY ========")
+                print("Items:")
                 for i, (item, quantity) in enumerate(player_character.inventory.items(), start=1):
-                    print(f"{i}. {item.name} x{quantity}")
-                print("==================================\n")
+                    if isinstance(item, Item):
+                        print(f"{i}. {item.name:<25} x{quantity}")
+                print("\nEquipment:")
+                for i, (item, quantity) in enumerate(player_character.inventory.items(), start=1):
+                    if isinstance(item, Equipment):
+                        print(f"{i}. {item.name:<25} x{quantity}")
+                print("\nCurrent Equipment:")
                 for slot, item in player_character.equipment.items():
                     name = item.name if item else "None"
-                    print(f"{slot.title()} : {name}")
+                    print(f"{slot.title():<10}: {name}")
+                print("==================================\n")
                 
-                item_choice = input("Choose item you want to use (B to back): ")
+                item_choice = input("Choose an item/equipment (B to back): ")
                 if item_choice.lower() == "b":
                     self.clear_screen()
                     continue
