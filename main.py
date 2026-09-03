@@ -1,4 +1,5 @@
 import systems.player as player
+from systems.party import Party
 import systems.monster as monster
 from systems.battle import Battle
 from systems.skills.knight import WIND_SWING, RISING_SHIELD, SHIELD_BASH, HEAL, BERSERK, INTIMIDATE
@@ -40,18 +41,28 @@ p2.add_item(MANA_POTION)
 p2.add_item(MANA_POTION)
 
 p1.add_item(LEGENDARY_LONG_SWORD)
-p1.equip_armor(WOODEN_ARMOR)
-p1.equip_weapon(WOODEN_LONG_SWORD)
-p1.equip_accessory(WOODEN_RING)
+p1.equip(WOODEN_ARMOR)
+p1.equip(WOODEN_LONG_SWORD)
+p1.equip(WOODEN_RING)
 # p1.gain_experience(1000)
 p1.info()
 p2.info()
 
+party = Party([p1, p2])
+party.add_item(HEALTH_POTION)
+party.add_item(LEGENDARY_LONG_SWORD)
+party.info()
+party.use_item(HEALTH_POTION, p1)
+party.info()
+party.equip(p1, LEGENDARY_LONG_SWORD)
+party.unequip(p1, LEGENDARY_LONG_SWORD)
+party.show_inventory()
 
-battle = Battle([p1, p2], [m1, m2, m3])
+
+battle = Battle(party, [m1, m2, m3])
 result = battle.battle()
 
 
-print("\nBattle finished!")
-p1.info()
+# print("\nBattle finished!")
+# p1.info()
 
