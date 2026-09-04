@@ -70,16 +70,22 @@ class Party:
             return False
 
         if isinstance(item, Armor):
-            old_equipment = character._equip("armor", item)
+            slot = "armor"
         elif isinstance(item, Weapon):
-            old_equipment = character._equip("weapon", item)
+            slot = "weapon"
         elif isinstance(item, Accessory):
-            old_equipment = character._equip("accessory", item)
+            slot = "accessory"
         else:
             print(f"{item.name} is not an equipment.")
             return False
 
+        if "all" not in item.role and character.role.lower() not in item.role:
+            print(f"{item.role} does not belong to {character.name}, because the role doesn't match!")
+            return False
+
+        old_equipment = character._equip(slot, item)
         self.inventory[item] -= 1
+
         if self.inventory[item] <= 0:
             del self.inventory[item]
 

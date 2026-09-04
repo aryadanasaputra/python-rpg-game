@@ -7,6 +7,7 @@ class Armor(Equipment):
 
 WOODEN_ARMOR = Armor(
     "Wooden Armor",
+    ["knight"],
     defense_bonus=10,
     max_health_bonus=5
 )

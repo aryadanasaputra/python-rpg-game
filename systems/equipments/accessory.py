@@ -7,6 +7,7 @@ class Accessory(Equipment):
 
 WOODEN_RING = Accessory(
     "Wooden Ring",
+    ["all"],
     max_mana_bonus=10,
     max_health_bonus=5
 )

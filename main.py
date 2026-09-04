@@ -7,7 +7,7 @@ from systems.skills.mage import IGNITE, FLAME_STRIKE, HEALING, GREATER_HEALING
 
 from systems.items.item import HEALTH_POTION, MANA_POTION
 from systems.equipments.armor import WOODEN_ARMOR
-from systems.equipments.weapon import WOODEN_LONG_SWORD, LEGENDARY_LONG_SWORD
+from systems.equipments.weapon import WOODEN_LONG_SWORD, LEGENDARY_LONG_SWORD, LEGENDARY_FIRE_STAFF
 from systems.equipments.accessory import WOODEN_RING
 # from systems.effects.effect import POISON, BUFF
 
@@ -51,11 +51,13 @@ p2.info()
 party = Party([p1, p2])
 party.add_item(HEALTH_POTION)
 party.add_item(LEGENDARY_LONG_SWORD)
+party.add_item(LEGENDARY_FIRE_STAFF)
+party.add_item(WOODEN_RING)
 party.info()
 party.use_item(HEALTH_POTION, p1)
 party.info()
-party.equip(p1, LEGENDARY_LONG_SWORD)
-party.unequip(p1, LEGENDARY_LONG_SWORD)
+# party.equip(p1, LEGENDARY_LONG_SWORD)
+# party.unequip(p1, LEGENDARY_LONG_SWORD)
 party.show_inventory()
 
 
