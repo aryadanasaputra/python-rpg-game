@@ -3,7 +3,7 @@ from .equipment import Equipment
 class Weapon(Equipment):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.type = "accessory"
+        self.type = "weapon"
 
 WOODEN_LONG_SWORD = Weapon(
     "Wooden Long Sword",
