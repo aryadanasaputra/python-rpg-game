@@ -281,10 +281,13 @@ class Battle:
                     self.clear_screen()
                     print(f"The monster block your way!")
                     continue
+
             elif choice == "6" or choice.lower() in ("cls", "clear"):
                 self.clear_screen()
+
             elif choice == "0":
                 return "quit"
+            
             else:
                 print("Invalid choice")
                 continue
