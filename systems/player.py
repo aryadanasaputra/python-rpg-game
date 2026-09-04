@@ -65,8 +65,6 @@ class Character:
             "accessory" : None}
 
         self.skills = []
-        self.inventory = {}
-        self.gold = 0
 
         self.experience = experience
         self.experience_limit = self._calculate_experience_limit()
@@ -90,7 +88,6 @@ class Character:
         skills_text = ', '.join(skill.name for skill in self.skills) if self.skills else "-"
         print(f"Skill   : {skills_text}")
         print(f"Status  : {'Life' if self.life else 'Dead'}")
-        print(f"Gold    : {self.gold} $")
         print("===================================")
 
     def status(self):
@@ -192,14 +189,13 @@ class Character:
             print(f"{self.name} rolls a {roll} for skill, total value: {attack_value}.")
             for target in targets:
                 result = self.resolve_attack(target, attack_value, roll)
-                if result != "miss" and target.life:
+                if result != "miss":
                     successful_targets.append(target)
 
         if skill.defense > 0:
             for target in targets:
                 target.defense += skill.defense
                 print(f"{self.name} increases defense by {skill.defense} (now {target.defense}).")
-                successful_targets.append(target)
 
         if skill.heal > 0:
             for target in targets:
@@ -208,11 +204,12 @@ class Character:
                 target.health = min(target.max_health, target.health + healing)
                 actual_healed = target.health - old_hp
                 print(f"{self.name} heals {actual_healed} HP (now {target.health}/{target.max_health}).")
-                successful_targets.append(target)
-        if skill.damage > 0:
-            self.add_skill_effect(skill, successful_targets)
-        else:
-            self.add_skill_effect(skill, effect_targets)
+
+        if skill.effect is not None:
+            if skill.effect_target == skill.target_type:
+                self.add_skill_effect(skill, successful_targets)
+            else:
+                self.add_skill_effect(skill, effect_targets)
         return True
 
     def add_skill_effect(self, skill, effect_targets):
@@ -226,51 +223,6 @@ class Character:
             effect = skill.effect.copy()
             effect.apply_immediate_effect(target)
             target.add_effect(effect)
-
-    # INVENTORY
-    def add_item(self, item):
-        if item in self.inventory:
-            self.inventory[item] += 1
-        else:
-            self.inventory[item] = 1
-        print(f"{self.name} obtained {item.name}")
-
-    def use_item(self, item):
-        if not self.can_act():
-            return False
-        
-        if item not in self.inventory:
-            print(f"{self.name} doesn't have {item.name}.")
-            return False
-
-        if item.type.lower() != "potion":
-            print(f"{item.name} is not a consumable item.")
-            return False
-        
-        print(f"{self.name} uses {item.name}")
-        old_health = self.health
-        old_mana = self.mana
-        self.health = min(self.max_health,self.health + item.health_restore)
-        self.mana = min(self.max_mana,self.mana + item.mana_restore)
-        actual_health = self.health - old_health
-        actual_mana = self.mana - old_mana
-
-        if item.health_restore > 0:
-            print(f"{self.name} restored {actual_health} HP.")
-
-        if item.mana_restore > 0:
-            print(f"{self.name} restored {actual_mana} MP.")
-
-        self.inventory[item] -= 1
-
-        if self.inventory[item] <= 0:
-            del self.inventory[item]
-            
-        return True
-
-    def add_gold(self, amount):
-        self.gold += amount
-        print(f"{self.name} obtained {amount} Gold!")
 
     # EQUIPMENT
     def _apply_equipment_stats(self, equipment, multiplier):
@@ -292,29 +244,7 @@ class Character:
         self.mana = min(self.mana, self.max_mana)
         print(f"{self.name} equipped {equipment.name}")
         return old_equipment
-
-    def equip(self, item):
-        if item not in self.inventory:
-            print(f"{self.name} doesn't have {item.name}")
-            return False
         
-        if isinstance(item, Armor):
-            self._equip("armor", item)
-        elif isinstance(item, Accessory):
-            self._equip("accessory", item)
-        elif isinstance(item, Weapon):
-            self._equip("weapon", item)
-        else:
-            print(f"{item.name} is not an equipment.")
-            return False
-        
-        self.inventory[item] -= 1
-        if self.inventory[item] <= 0:
-            del self.inventory[item]
-
-        return True
-        
-
     def _unequip(self, slot):
         equipment = self.equipment[slot]
 
@@ -329,24 +259,6 @@ class Character:
         self.mana = min(self.mana, self.max_mana)
         print(f"{self.name} unequipped {equipment.name}")
         return equipment
-
-    def equip_armor(self, armor):
-        self._equip("armor", armor)
-
-    def unequip_armor(self):
-        self._unequip("armor")
-
-    def equip_weapon(self, weapon):
-        self._equip("weapon", weapon)
-
-    def unequip_weapon(self):
-        self._unequip("weapon")
-
-    def equip_accessory(self, accessory):
-        self._equip("accessory", accessory)
-    
-    def unequip_accessory(self):
-        self._unequip("accessory")
         
     # COMBAT
     def resolve_attack(self, target, attack_value, roll, miss=4, crit=18):
@@ -389,19 +301,28 @@ class Character:
         print(f"{self.name} is effected by {effect.name}")
         if effect.attack_bonus > 0:
             print(f"{self.name} increases attack by {effect.attack_bonus}.")
+        elif effect.attack_bonus < 0:
+            print(f"{self.name} decreases attack by {effect.attack_bonus}.")
+
         if effect.defense_bonus > 0:
             print(f"{self.name} increases defense by {effect.defense_bonus}.")
+        elif effect.defense_bonus < 0:
+            print(f"{self.name} decreases defense by {effect.defense_bonus}.")
+
         if effect.max_health_bonus > 0:
             print(f"{self.name} increases maximum health by {effect.max_health_bonus}.")
+
         if effect.max_mana_bonus > 0:
             print(f"{self.name} increases maximum mana by {effect.max_mana_bonus}.")
 
     def apply_effect_stat(self, effect):
-        self.attack += effect.attack_bonus
-        self.defense += effect.defense_bonus
+        attack = self.attack + effect.attack_bonus
+        defense = self.defense + effect.defense_bonus
         self.max_health += effect.max_health_bonus
         self.max_mana += effect.max_mana_bonus
 
+        self.defense = max(0, defense)
+        self.attack = max(0, attack)
         self.health = min(self.health, self.max_health)
         self.mana = min(self.mana, self.max_mana)
 

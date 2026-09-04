@@ -116,7 +116,7 @@ class Monster:
             print(f"{self.name} increases maximum mana by {effect.max_mana_bonus}.")
 
     def apply_effect_stat(self, effect):
-        self.attack += effect.attack_bonus
+        self.attack_power += effect.attack_bonus
         self.defense += effect.defense_bonus
         self.max_health += effect.max_health_bonus
         self.max_mana += effect.max_mana_bonus
@@ -125,7 +125,7 @@ class Monster:
         self.mana = min(self.mana, self.max_mana)
 
     def remove_effect_stat(self, effect):
-        self.attack -= effect.attack_bonus
+        self.attack_power -= effect.attack_bonus
         self.defense -= effect.defense_bonus
         self.max_health -= effect.max_health_bonus
         self.max_mana -= effect.max_mana_bonus

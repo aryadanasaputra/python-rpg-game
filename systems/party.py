@@ -22,34 +22,47 @@ class Party:
             self.inventory[item] = 1
         print(f"Party obtained {item.name}")
 
-    def use_item(self, item, character):
+    def use_item(self, item, targets):
         if item not in self.inventory:
             print(f"Party doesn't have {item.name}.")
             return False
 
+        effect_targets = targets if targets is not None else []
+
         if item.type.lower() == "potion":
-            print(f"{character.name} uses {item.name}")
-            old_health = character.health
-            old_mana = character.mana
-            character.health = min(character.max_health,character.health + item.health_restore)
-            character.mana = min(character.max_mana,character.mana + item.mana_restore)
-            actual_health = character.health - old_health
-            actual_mana = character.mana - old_mana
-
-            if item.health_restore > 0:
-                print(f"{character.name} restored {actual_health} HP.")
-
-            if item.mana_restore > 0:
-                print(f"{character.name} restored {actual_mana} MP.")
-
+            for target in targets:
+                print(f"{target.name} uses {item.name}")
+                old_health = target.health
+                old_mana = target.mana
+                target.health = min(target.max_health,target.health + item.health_restore)
+                target.mana = min(target.max_mana,target.mana + item.mana_restore)
+                actual_health = target.health - old_health
+                actual_mana = target.mana - old_mana
+                if item.health_restore > 0:
+                    print(f"{target.name} restored {actual_health} HP.")
+                if item.mana_restore > 0:
+                    print(f"{target.name} restored {actual_mana} MP.")
+                
+            self.add_item_effect(item, effect_targets)
             self.inventory[item] -= 1
 
             if self.inventory[item] <= 0:
                 del self.inventory[item]
-            print(f"{character.name} used {item.name}")
+            print(f"Party used {item.name}")
             return True
             
         return False
+
+    def add_item_effect(self, item, effect_target):
+        if item.effect is None:
+            return
+        for target in effect_target:
+            if not target.life:
+                print(f"{target.name} is already dead and cannot be affected by {item.effect.name}.")
+                continue
+            effect = item.effect.copy()
+            effect.apply_immediete_effect(target)
+            target.add_effect(effect)
 
     def add_gold(self, amount):
         self.gold += amount

@@ -256,10 +256,15 @@ class Battle:
                 items = list(self.party.inventory.keys())
                 if 0 <= index < len(items):
                     selected_item = items[index]
+
                     if isinstance(selected_item, Equipment):
                         success = self.party.equip(player_character, selected_item)
                     else:
-                        success = self.party.use_item(selected_item, player_character)
+                        targets = self.get_target(player_character, selected_item.target_type)
+                        if not targets:
+                            print(f"No valid target for using item.")
+                            continue
+                        success = self.party.use_item(selected_item, targets)
                     if success:
                         return "used"
                 else:

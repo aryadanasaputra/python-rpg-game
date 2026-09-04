@@ -5,7 +5,7 @@ from systems.battle import Battle
 from systems.skills.knight import WIND_SWING, RISING_SHIELD, SHIELD_BASH, HEAL, BERSERK, INTIMIDATE
 from systems.skills.mage import IGNITE, FLAME_STRIKE, HEALING, GREATER_HEALING
 
-from systems.items.item import HEALTH_POTION, MANA_POTION
+from systems.items.item import HEALTH_POTION, MANA_POTION, MANA_REGEN_POTION
 from systems.equipments.armor import WOODEN_ARMOR
 from systems.equipments.weapon import WOODEN_LONG_SWORD, LEGENDARY_LONG_SWORD, LEGENDARY_FIRE_STAFF
 from systems.equipments.accessory import WOODEN_RING
@@ -25,40 +25,28 @@ p1.learn_skill(HEAL)
 p1.learn_skill(BERSERK)
 p1.learn_skill(INTIMIDATE)
 
-p1.add_item(HEALTH_POTION)
-p1.add_item(HEALTH_POTION)
-p1.add_item(HEALTH_POTION)
-p1.add_item(MANA_POTION)
-
 p2.learn_skill(IGNITE)
 p2.learn_skill(FLAME_STRIKE)
 p2.learn_skill(HEALING)
 p2.learn_skill(GREATER_HEALING)
 
-p2.add_item(HEALTH_POTION)
-p2.add_item(MANA_POTION)
-p2.add_item(MANA_POTION)
-p2.add_item(MANA_POTION)
-
-p1.add_item(LEGENDARY_LONG_SWORD)
-p1.equip(WOODEN_ARMOR)
-p1.equip(WOODEN_LONG_SWORD)
-p1.equip(WOODEN_RING)
 # p1.gain_experience(1000)
 p1.info()
 p2.info()
 
 party = Party([p1, p2])
 party.add_item(HEALTH_POTION)
+party.add_item(MANA_POTION)
+party.add_item(MANA_REGEN_POTION)
 party.add_item(LEGENDARY_LONG_SWORD)
 party.add_item(LEGENDARY_FIRE_STAFF)
 party.add_item(WOODEN_RING)
-party.info()
-party.use_item(HEALTH_POTION, p1)
-party.info()
+# party.info()
+# party.use_item(HEALTH_POTION, [p1])
+# party.info()
 # party.equip(p1, LEGENDARY_LONG_SWORD)
 # party.unequip(p1, LEGENDARY_LONG_SWORD)
-party.show_inventory()
+# party.show_inventory()
 
 
 battle = Battle(party, [m1, m2, m3])
