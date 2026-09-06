@@ -108,19 +108,27 @@ class Monster:
         print(f"{self.name} is effected by {effect.name}")
         if effect.attack_bonus > 0:
             print(f"{self.name} increases attack by {effect.attack_bonus}.")
+        elif effect.attack_bonus < 0:
+            print(f"{self.name} decreases attack by {effect.attack_bonus}.")
+
         if effect.defense_bonus > 0:
             print(f"{self.name} increases defense by {effect.defense_bonus}.")
+        elif effect.defense_bonus < 0:
+            print(f"{self.name} decreases defense by {effect.defense_bonus}.")
+
         if effect.max_health_bonus > 0:
             print(f"{self.name} increases maximum health by {effect.max_health_bonus}.")
         if effect.max_mana_bonus > 0:
             print(f"{self.name} increases maximum mana by {effect.max_mana_bonus}.")
 
     def apply_effect_stat(self, effect):
-        self.attack_power += effect.attack_bonus
-        self.defense += effect.defense_bonus
+        attack = self.attack_power + effect.attack_bonus
+        defense = self.defense + effect.defense_bonus
         self.max_health += effect.max_health_bonus
         self.max_mana += effect.max_mana_bonus
 
+        self.defense = max(0, defense)
+        self.attack_power = max(0, attack)
         self.health = min(self.health, self.max_health)
         self.mana = min(self.mana, self.max_mana)
 
