@@ -145,6 +145,15 @@ class Battle:
 
         return []
 
+    def is_choice(self, choice):
+        if choice.lower() == "b":
+            self.clear_screen()
+            return False
+        elif not choice.isdigit():
+            print("Please eneter a number!")
+            return False
+        return True
+
     def player_turn(self, player_character):
         while True:
             print("\n======================")
@@ -191,11 +200,7 @@ class Battle:
                 print("==============================")
                 print(f"Current {player_character.name} MP: {player_character.mana}/{player_character.max_mana}\n")
                 skill_choice = input("Choose skill you want to use (B to back): ")
-                if skill_choice.lower() == "b":
-                    self.clear_screen()
-                    continue
-                elif not skill_choice.isdigit():
-                    print("Please enter a number")
+                if not self.is_choice(skill_choice):
                     continue
                 
                 index = int(skill_choice) - 1
@@ -226,49 +231,65 @@ class Battle:
 
             elif choice == "3":
                 self.clear_screen()
-                if not self.party.inventory:
-                    print("No item")
-
-                print("======== PLAYER INVENTORY ========")
-                print("Items:")
-                for i, (item, quantity) in enumerate(self.party.inventory.items(), start=1):
-                    if isinstance(item, Item):
-                        print(f"{i}. {item.name:<25} x{quantity}")
-                print("\nEquipment:")
-                for i, (item, quantity) in enumerate(self.party.inventory.items(), start=1):
-                    if isinstance(item, Equipment):
-                        print(f"{i}. {item.name:<25} x{quantity}")
-                print("\nCurrent Equipment:")
-                for slot, item in player_character.equipment.items():
-                    name = item.name if item else "None"
-                    print(f"{slot.title():<10}: {name}")
-                print("==================================\n")
-                
-                item_choice = input("Choose an item/equipment (B to back): ")
-                if item_choice.lower() == "b":
-                    self.clear_screen()
+                print("1. Items")
+                print("2. Equipment")
+                inventory_choice = input("Choose (B to back): ")
+                if not self.is_choice(inventory_choice):
                     continue
-                elif not item_choice.isdigit():
-                    print("Please enter a number")
-                    continue
+                if inventory_choice == "1":
+                    if not self.party.item_inventory:
+                        print("No item")
 
-                index = int(item_choice) - 1
-                items = list(self.party.inventory.keys())
-                if 0 <= index < len(items):
-                    selected_item = items[index]
+                    print("======== PLAYER INVENTORY ITEM ========")
+                    for i, (item, quantity) in enumerate(self.party.item_inventory.items(), start=1):
+                        print(f"{i}. {item.name:<25} x{quantity}")
+                    print("=======================================\n")
+                    item_choice = input("Choose an item (B to back): ")
+                    if not self.is_choice(item_choice):
+                        continue
 
-                    if isinstance(selected_item, Equipment):
-                        success = self.party.equip(player_character, selected_item)
-                    else:
+                    index = int(item_choice) - 1
+                    items = list(self.party.item_inventory.keys())
+                    if 0 <= index < len(items):
+                        selected_item = items[index]
                         targets = self.get_target(player_character, selected_item.target_type)
                         if not targets:
                             print(f"No valid target for using item.")
                             continue
                         success = self.party.use_item(selected_item, targets)
-                    if success:
-                        return "used"
-                else:
-                    print("Invalid item choice")
+                        if success:
+                            return "used"
+                    else:
+                        print("Invalid item choice")
+                elif inventory_choice == "2":
+                    print("======== PLAYER INVENTORY EQUIPMENT ========")
+                    print("Equipment:")
+                    if not self.party.equipment_inventory:
+                        print("No Equipment")
+                    else:
+                        for i, (equipment, quantity) in enumerate(self.party.equipment_inventory.items(), start=1):
+                            print(f"{i}. {equipment.name:<25} x{quantity}")
+                    print("\nCurrent Equipment:")
+                    for slot, equipment in player_character.equipment.items():
+                        name = equipment.name if equipment else "None"
+                        print(f"{slot.title():<10}: {name}")
+                    print("============================================\n")
+                    equipment_choice = input("Choose an equipment (B to back): ")
+                    if not self.is_choice(equipment_choice):
+                        continue
+
+                    index = int(equipment_choice) - 1
+                    equipments = list(self.party.equipment_inventory.keys())
+                    if 0 <= index < len(equipments):
+                        selected_equipment = equipments[index]
+                        success = self.party.equip(player_character, selected_equipment)
+                        if success:
+                            return "used"
+                    else:
+                        print("Invalid equipment choice")
+                     
+
+                
                     
             elif choice == "4":
                 self.clear_screen()

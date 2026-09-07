@@ -1,3 +1,5 @@
+from systems.items.item import Item
+from systems.equipments.equipment import Equipment
 from systems.equipments.armor import Armor
 from systems.equipments.weapon import Weapon
 from systems.equipments.accessory import Accessory
@@ -6,6 +8,8 @@ class Party:
     def __init__(self, characters):
         self.characters = characters
         self.inventory = {}
+        self.item_inventory = {}
+        self.equipment_inventory = {}
         self.gold = 0
 
     def info(self):
@@ -16,14 +20,22 @@ class Party:
                   f"   - Mana   : {character.mana}/{character.max_mana}")
 
     def add_item(self, item):
-        if item in self.inventory:
-            self.inventory[item] += 1
+        if isinstance(item, Item):
+            inventory = self.item_inventory
+        elif isinstance(item, Equipment):
+            inventory = self.equipment_inventory
         else:
-            self.inventory[item] = 1
+            print(f"{item.name} cannot be added to inventory.")
+            return False
+        
+        if item in inventory:
+            inventory[item] += 1
+        else:
+            inventory[item] = 1
         print(f"Party obtained {item.name}")
 
     def use_item(self, item, targets):
-        if item not in self.inventory:
+        if item not in self.item_inventory:
             print(f"Party doesn't have {item.name}.")
             return False
 
@@ -44,10 +56,10 @@ class Party:
                     print(f"{target.name} restored {actual_mana} MP.")
                 
             self.add_item_effect(item, effect_targets)
-            self.inventory[item] -= 1
+            self.item_inventory[item] -= 1
 
-            if self.inventory[item] <= 0:
-                del self.inventory[item]
+            if self.item_inventory[item] <= 0:
+                del self.item_inventory[item]
             print(f"Party used {item.name}")
             return True
             
@@ -68,17 +80,8 @@ class Party:
         self.gold += amount
         print(f"Party obtained {amount} Gold!")
 
-    def show_inventory(self):
-        print("\n========== PARTY INVENTORY ==========")
-        if not self.inventory:
-            print("Inventory is empty.")
-        else:
-            for item, quantity in self.inventory.items():
-                print(f"{item.name} x{quantity}")
-        print("=====================================")
-
     def equip(self, character, item):
-        if item not in self.inventory:
+        if item not in self.equipment_inventory:
             print(f"Party doesn't have {item.name}.")
             return False
 
@@ -93,14 +96,15 @@ class Party:
             return False
 
         if "all" not in item.role and character.role.lower() not in item.role:
-            print(f"{item.role} does not belong to {character.name}, because the role doesn't match!")
+            roles = ", ".join(item.role)
+            print(f"{character.name} cannot equip this equipment. It can only be used by {roles.title()}.")
             return False
 
         old_equipment = character._equip(slot, item)
-        self.inventory[item] -= 1
+        self.equipment_inventory[item] -= 1
 
-        if self.inventory[item] <= 0:
-            del self.inventory[item]
+        if self.equipment_inventory[item] <= 0:
+            del self.equipment_inventory[item]
 
         if old_equipment:
             self.add_item(old_equipment)
