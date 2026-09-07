@@ -237,12 +237,12 @@ class Battle:
                 if not self.is_choice(inventory_choice):
                     continue
                 if inventory_choice == "1":
+                    print("======== PLAYER INVENTORY ITEM ========")
                     if not self.party.item_inventory:
                         print("No item")
-
-                    print("======== PLAYER INVENTORY ITEM ========")
-                    for i, (item, quantity) in enumerate(self.party.item_inventory.items(), start=1):
-                        print(f"{i}. {item.name:<25} x{quantity}")
+                    else:
+                        for i, (item, quantity) in enumerate(self.party.item_inventory.items(), start=1):
+                            print(f"{i}. {item.name:<25} x{quantity}")
                     print("=======================================\n")
                     item_choice = input("Choose an item (B to back): ")
                     if not self.is_choice(item_choice):
