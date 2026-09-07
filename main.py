@@ -41,18 +41,8 @@ party.add_item(MANA_REGEN_POTION)
 party.add_item(LEGENDARY_LONG_SWORD)
 party.add_item(LEGENDARY_FIRE_STAFF)
 party.add_item(WOODEN_RING)
-# party.info()
-# party.use_item(HEALTH_POTION, [p1])
-# party.info()
-# party.equip(p1, LEGENDARY_LONG_SWORD)
-# party.unequip(p1, LEGENDARY_LONG_SWORD)
-# party.show_inventory()
 
 
 battle = Battle(party, [m1, m2, m3])
 result = battle.battle()
-
-
-# print("\nBattle finished!")
-# p1.info()
 
