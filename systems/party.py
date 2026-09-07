@@ -73,7 +73,7 @@ class Party:
                 print(f"{target.name} is already dead and cannot be affected by {item.effect.name}.")
                 continue
             effect = item.effect.copy()
-            effect.apply_immediete_effect(target)
+            effect.apply_immediate_effect(target)
             target.add_effect(effect)
 
     def add_gold(self, amount):

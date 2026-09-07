@@ -1,11 +1,14 @@
 import random
+from systems.effects.effect import POISON
 
 MONSTER_STATS = {
     "Goblin": {
         "max_health": 50,
         "max_mana": 0,
         "attack": 7,
-        "defense": 2
+        "defense": 2,
+        "monster_effect": POISON,
+        "effect_chance": 0.5
     },
     "Slime": {
         "max_health": 20,
@@ -21,7 +24,7 @@ MONSTER_STATS = {
     }
 }
 class Monster:
-    def __init__(self, name, level=1, experience_reward=100, gold_reward=10, drop_item=None, drop_chance=0.5):
+    def __init__(self, name, level=1, experience_reward=100, gold_reward=10, drop_item=None, drop_chance=0.5, monster_effect=None, effect_chance=0.5):
         self.name = name
         self.level = level
 
@@ -39,8 +42,11 @@ class Monster:
         self.defense = int(base["defense"] * scale)
         self.experience_reward = int(experience_reward * scale)
         self.gold_reward = int(gold_reward * scale)
-        self.drop_chance = drop_chance
         self.drop_item = drop_item
+        self.drop_chance = drop_chance
+
+        self.monster_effect = base.get("monster_effect")
+        self.effect_chance = base.get("effect_chance")
         self.reward_given = False
 
         self.effects = []
@@ -80,11 +86,13 @@ class Monster:
             damage = max(1, attack_value - player.defense)
             player.health -= damage
             print(f"{self.name} attacks {player.name} and causes {damage} damage!")
+            self.attack_effect(player)
             player.status()
         else:
             damage = max(1,(attack_value - player.defense) * 2)
             player.health -= damage
             print(f"{self.name} lands a critical hit on {player.name} and causes {damage} damage!")
+            self.attack_effect(player)
             player.status()
 
     def attack(self, player):
@@ -96,6 +104,16 @@ class Monster:
         roll = random.randint(1, 20)
         attack_value = self.attack_power + roll
         self.resolve_attack(player, attack_value, roll)
+
+    def attack_effect(self, player):
+        if self.monster_effect is None:
+            return
+        if not player.life:
+            return
+        if random.random() <= self.effect_chance:
+            effect = self.monster_effect.copy()
+            effect.apply_immediate_effect(player)
+            player.add_effect(effect)
 
     def add_effect(self, effect):
         for existing_effect in self.effects:
