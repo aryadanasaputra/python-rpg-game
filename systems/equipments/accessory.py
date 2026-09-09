@@ -11,3 +11,9 @@ WOODEN_RING = Accessory(
     max_mana_bonus=10,
     max_health_bonus=5
 )
+GOLDEN_RING = Accessory(
+    "Golden Ring",
+    ["all"],
+    max_mana_bonus=100,
+    max_health_bonus=50
+)

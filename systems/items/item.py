@@ -48,7 +48,7 @@ MANA_POTION = Item(
 )
 
 MANA_REGEN_POTION = Item(
-    "Mana Potion",
+    "Mana Regen Potion",
     "Potion",
     # "Normal",
     mana_restore=25,
