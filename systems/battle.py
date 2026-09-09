@@ -196,7 +196,7 @@ class Battle:
                 
                 print("======== PLAYER SKILL ========")
                 for i, skill_list in enumerate(player_character.skills, start=1):
-                    print(f"{i}. {skill_list.name} (MP: {skill_list.mana_cost})")
+                    print(f"{i}. {skill_list.name:<17} (MP: {skill_list.mana_cost})")
                 print("==============================")
                 print(f"Current {player_character.name} MP: {player_character.mana}/{player_character.max_mana}\n")
                 skill_choice = input("Choose skill you want to use (B to back): ")
@@ -270,26 +270,35 @@ class Battle:
                         for i, (equipment, quantity) in enumerate(self.party.equipment_inventory.items(), start=1):
                             print(f"{i}. {equipment.name:<25} x{quantity}")
                     print("\nCurrent Equipment:")
-                    for slot, equipment in player_character.equipment.items():
+                    for i, (slot, equipment) in enumerate(player_character.equipment.items(), start=1):
                         name = equipment.name if equipment else "None"
-                        print(f"{slot.title():<10}: {name}")
+                        action_unequip = f"[u{i}]" if equipment else ""
+                        print(f"{slot.title():<10}: {name:<20} {action_unequip}")
                     print("============================================\n")
-                    equipment_choice = input("Choose an equipment (B to back): ")
-                    if not self.is_choice(equipment_choice):
+                    equipment_choice = input("Choose an equipment (B to back and u + number for unequip): ")
+                    if equipment_choice.lower() == "b":
+                        self.clear_screen()
                         continue
-
-                    index = int(equipment_choice) - 1
-                    equipments = list(self.party.equipment_inventory.keys())
-                    if 0 <= index < len(equipments):
-                        selected_equipment = equipments[index]
-                        success = self.party.equip(player_character, selected_equipment)
-                        if success:
-                            return "used"
+                    elif equipment_choice.startswith("u") and equipment_choice[1:].isdigit():
+                        index = int(equipment_choice[1:]) - 1
+                        equipment_slots = list(player_character.equipment.keys())
+                        if 0 <= index < len(equipment_slots):
+                            slot = equipment_slots[index]
+                            success = self.party.unequip(player_character, slot)
+                        else: 
+                            print("Invalid equipment choice")
+                    elif equipment_choice.isdigit():
+                        index = int(equipment_choice) - 1
+                        equipments = list(self.party.equipment_inventory.keys())
+                        if 0 <= index < len(equipments):
+                            selected_equipment = equipments[index]
+                            success = self.party.equip(player_character, selected_equipment)
+                        else: 
+                            print("Invalid equipment choice")
                     else:
                         print("Invalid equipment choice")
-                     
-
-                
+                    # if success:
+                    #     return "used"
                     
             elif choice == "4":
                 self.clear_screen()

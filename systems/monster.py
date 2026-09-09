@@ -1,5 +1,5 @@
 import random
-from systems.effects.effect import POISON
+from systems.effects.effect import POISON, BLEEDING
 
 MONSTER_STATS = {
     "Goblin": {
@@ -8,19 +8,23 @@ MONSTER_STATS = {
         "attack": 7,
         "defense": 2,
         "monster_effect": POISON,
-        "effect_chance": 0.5
+        "effect_chance": 0.3
     },
     "Slime": {
         "max_health": 20,
         "max_mana": 0,
         "attack": 5,
-        "defense": 0
+        "defense": 0,
+        "monster_effect": POISON,
+        "effect_chance": 0.5
     },
     "Kobold": {
         "max_health": 60,
         "max_mana": 0,
         "attack": 9,
-        "defense": 8
+        "defense": 8,
+        "monster_effect": BLEEDING,
+        "effect_chance": 0.6
     }
 }
 class Monster:

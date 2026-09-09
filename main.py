@@ -8,7 +8,7 @@ from systems.skills.mage import IGNITE, FLAME_STRIKE, HEALING, GREATER_HEALING
 from systems.items.item import HEALTH_POTION, MANA_POTION, MANA_REGEN_POTION
 from systems.equipments.armor import WOODEN_ARMOR
 from systems.equipments.weapon import WOODEN_LONG_SWORD, LEGENDARY_LONG_SWORD, LEGENDARY_FIRE_STAFF
-from systems.equipments.accessory import WOODEN_RING
+from systems.equipments.accessory import WOODEN_RING, GOLDEN_RING
 # from systems.effects.effect import POISON, BUFF
 
 p1 = player.Character("Arya", "Knight", level=2)
@@ -38,9 +38,12 @@ party = Party([p1, p2])
 party.add_item(HEALTH_POTION)
 party.add_item(MANA_POTION)
 party.add_item(MANA_REGEN_POTION)
+party.add_item(WOODEN_LONG_SWORD)
 party.add_item(LEGENDARY_LONG_SWORD)
 party.add_item(LEGENDARY_FIRE_STAFF)
+party.add_item(WOODEN_ARMOR)
 party.add_item(WOODEN_RING)
+party.add_item(GOLDEN_RING)
 
 
 battle = Battle(party, [m1, m2, m3])

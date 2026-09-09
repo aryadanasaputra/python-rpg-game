@@ -7,7 +7,6 @@ from systems.equipments.accessory import Accessory
 class Party:
     def __init__(self, characters):
         self.characters = characters
-        self.inventory = {}
         self.item_inventory = {}
         self.equipment_inventory = {}
         self.gold = 0
@@ -110,16 +109,8 @@ class Party:
             self.add_item(old_equipment)
         return True
 
-    def unequip(self, character, item):
-        if isinstance(item, Armor):
-            equipment =character._unequip("armor")
-        elif isinstance(item, Weapon):
-            equipment =character._unequip("weapon")
-        elif isinstance(item, Accessory):
-            equipment =character._unequip("accessory")
-        else:
-            print(f"{item.name} is not an equipment.")
-            return False
+    def unequip(self, character, slot):
+        equipment =character._unequip(slot)
 
         if equipment is None:
             return False
