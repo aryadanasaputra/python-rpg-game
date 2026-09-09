@@ -5,14 +5,14 @@ from systems.equipments.accessory import Accessory
 
 ROLE_STATS = {
     "Knight": {
-        "max_health": 125,
-        "max_mana": 25,
+        "max_health": 1250,
+        "max_mana": 250,
         "attack": 15,
         "defense": 10
     },
     "Mage": {
-        "max_health": 80,
-        "max_mana": 100,
+        "max_health": 800,
+        "max_mana": 1000,
         "attack": 10,
         "defense": 3
     },
@@ -206,10 +206,12 @@ class Character:
                 print(f"{self.name} heals {actual_healed} HP (now {target.health}/{target.max_health}).")
 
         if skill.effect is not None:
-            if skill.effect_target == skill.target_type:
-                self.add_skill_effect(skill, successful_targets)
+            if skill.damage > 0 and skill.effect_target == skill.target_type:
+                effect_targets_to_apply = successful_targets
             else:
-                self.add_skill_effect(skill, effect_targets)
+                effect_targets_to_apply = effect_targets
+
+            self.add_skill_effect(skill, effect_targets_to_apply)
         return True
 
     def add_skill_effect(self, skill, effect_targets):
@@ -293,8 +295,9 @@ class Character:
     def add_effect(self, effect):
         for existing_effect in self.effects:
             if existing_effect.name == effect.name:
-                existing_effect.duration += effect.duration
+                extended_duration = existing_effect.duration + effect.duration
                 print(f"{self.name}'s {effect.name} duration extended by {effect.duration} turns.")
+                print(f"{self.name}'s {effect.name} now {extended_duration} turn left.")
                 return
         self.effects.append(effect)
         self.apply_effect_stat(effect)
@@ -347,6 +350,7 @@ class Character:
             effect.duration -= 1
             if effect.duration <= 0:
                 expired.append(effect)
+            print(f"{self.name}'s {effect.name.lower()} {effect.duration} left.")
 
         for effect in (expired):
             self.remove_effect(effect)
