@@ -1,3 +1,4 @@
+from game.game import Game
 import systems.player as player
 from systems.party import Party
 import systems.monster as monster
@@ -45,7 +46,9 @@ party.add_item(WOODEN_ARMOR)
 party.add_item(WOODEN_RING)
 party.add_item(GOLDEN_RING)
 
+game = Game()
+game.run()
 
-battle = Battle(party, [m1, m2, m3])
-result = battle.battle()
+# battle = Battle(party, [m1, m2, m3])
+# result = battle.battle()
 
