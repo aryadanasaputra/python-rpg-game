@@ -1,4 +1,5 @@
-import pygame
+import pygame # pyright: ignore[reportMissingImports]
+from game.ui import Button, draw_bar, draw_battle_log
 
 class BattleScene:
     def __init__(self, screen, player, monster):
@@ -6,12 +7,20 @@ class BattleScene:
         self.player = player
         self.monster = monster
 
-        self.attack_button = pygame.Rect(100, 620, 150, 50)
         # Set font
+        self.font_small = pygame.font.Font(None, 24)
         self.font = pygame.font.Font(None, 36)
 
+        self.attack_button = Button((100, 620, 150, 50), "Attack", self.font)
+        self.skill_button = Button((270, 620, 150, 50), "Skill", self.font)
+
+        self.turn = "player"
+
+        self.battle_log = []
+
     def update(self):
-        pass
+        if self.turn =="monster":
+            self.monster_turn()
 
     def draw(self):
         self.screen.fill((30, 30, 30))
@@ -32,7 +41,7 @@ class BattleScene:
 
         # Text Player
         player_text = self.font.render(
-            self.player.name, # Text yang akan muncul
+            f"{self.player.name} (Lv.{self.player.level})", # Text yang akan muncul
             True,
             (255,255,255) # Warna
         )
@@ -40,30 +49,44 @@ class BattleScene:
 
         # Text Monster
         monster_text = self.font.render(
-            self.monster.name,
+            f"{self.monster.name} (Lv.{self.monster.level})",
             True,
             (255,255,255)
         )
         self.screen.blit(monster_text, (750, 120))
 
-        self.draw_health_bar(
-            self.player,
-            100,
-            570
-        )
-        self.draw_health_bar(
-            self.monster,
-            750,
-            270
-        )
-
-        hp_text = self.font.render(
-            f"HP: {self.player.health}/{self.player.max_health}",
+        # HP Bar Player
+        draw_bar(self.screen, self.player.health, self.player.max_health, 100, 570)
+        hp_text = self.font_small.render(
+            f"HP:",
             True,
             (255, 255, 255)
         )
-        self.screen.blit(hp_text, (100, 600))
+        self.screen.blit(hp_text, (65, 567))
+        hp_count_text = self.font_small.render(
+            f"{self.player.health}/{self.player.max_health}",
+            True,
+            (255, 255, 255)
+        )
+        self.screen.blit(hp_count_text, (205, 567))
+        
+        # MP Bar Player
+        draw_bar(self.screen, self.player.mana, self.player.max_mana, 100, 590, color=(91, 208, 243))
+        mana_text = self.font_small.render(
+            f"MP:",
+            True,
+            (255, 255, 255)
+        )
+        self.screen.blit(mana_text, (65, 587))
+        mana_count_text = self.font_small.render(
+            f"{self.player.mana}/{self.player.max_mana}",
+            True,
+            (255, 255, 255)
+        )
+        self.screen.blit(mana_count_text, (205, 587))
 
+        # HP Bar Monster
+        draw_bar(self.screen, self.monster.health, self.monster.max_health, 750, 270)
         monster_hp_text = self.font.render(
             f"HP: {self.monster.health}/{self.monster.max_health}",
             True,
@@ -71,41 +94,34 @@ class BattleScene:
         )
         self.screen.blit(monster_hp_text, (750, 300))
 
-        pygame.draw.rect(
-            self.screen,
-            (100, 100, 100),
-            self.attack_button
-        )
+        self.attack_button.draw(self.screen)
+        self.skill_button.draw(self.screen)
 
-        attack_text = self.font.render(
-            "Attack",
+        turn_text = self.font.render(
+            f"{self.turn.upper()} TURN",
             True,
             (255, 255, 255)
         )
 
-        self.screen.blit(
-            attack_text,
-            (125, 630)
-        )
+        self.screen.blit(turn_text, (400, 50))
 
-    def draw_health_bar(self, character, x, y, width=100, height=10):
-        health_ratio = character.health / character.max_health
-
-        # Background bar
-        pygame.draw.rect(
-            self.screen,
-            (80, 80, 80),
-            (x, y, width, height)
-        )
-
-        # Current HP
-        pygame.draw.rect(
-            self.screen,
-            (50, 200, 50),
-            (x, y, width * health_ratio, height)
-        )
+        draw_battle_log(self.screen, self.font_small, self.battle_log)
 
     def handle_event(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN:
-            if self.attack_button.collidepoint(event.pos):
-                print("Attack ditekan!")
+            if self.attack_button.is_clicked(event):
+                if self.turn == "player":
+                    self.player.attack_target(self.monster)
+                    self.add_log(f"{self.player.name} attacks {self.monster.name}!")
+                    if not self.monster.life:
+                        return
+                    self.turn = "monster"
+                    
+    def monster_turn(self):
+        self.monster.attack(self.player)
+        self.add_log(f"{self.monster.name} attacks {self.player.name}!")
+        self.turn = "player"
+
+    def add_log(self, message):
+        self.battle_log.append(message)
+

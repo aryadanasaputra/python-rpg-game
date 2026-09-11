@@ -1,4 +1,4 @@
-import pygame
+import pygame  # pyright: ignore[reportMissingImports]
 from game.battle_scene import BattleScene
 from systems.player import Character
 from systems.monster import Monster
@@ -15,7 +15,7 @@ class Game:
         self.running = True
 
         self.player = Character("Arya", "Knight", level=2)
-        self.monster = Monster("Goblin", level=2)
+        self.monster = Monster("Kobold", level=3)
 
         self.battle_scene = BattleScene(self.screen, self.player, self.monster)
 
