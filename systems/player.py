@@ -5,14 +5,14 @@ from systems.equipments.accessory import Accessory
 
 ROLE_STATS = {
     "Knight": {
-        "max_health": 1250,
-        "max_mana": 250,
+        "max_health": 125,
+        "max_mana": 25,
         "attack": 15,
         "defense": 10
     },
     "Mage": {
-        "max_health": 800,
-        "max_mana": 1000,
+        "max_health": 80,
+        "max_mana": 100,
         "attack": 10,
         "defense": 3
     },
