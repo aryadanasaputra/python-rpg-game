@@ -2,6 +2,7 @@ import pygame  # pyright: ignore[reportMissingImports]
 from game.battle_scene import BattleScene
 from systems.player import Character
 from systems.monster import Monster
+from systems.party import Party
 
 class Game:
     def __init__(self):
