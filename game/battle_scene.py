@@ -1,5 +1,6 @@
 import pygame # pyright: ignore[reportMissingImports]
 from game.ui import Button, draw_bar, draw_battle_log
+from systems.skills.knight import WIND_SWING
 
 class BattleScene:
     def __init__(self, screen, player, monster):
@@ -7,14 +8,23 @@ class BattleScene:
         self.player = player
         self.monster = monster
 
+        # Set State Menu
+        self.menu = "main"
+
         # Set font
         self.font_small = pygame.font.Font(None, 24)
         self.font = pygame.font.Font(None, 36)
 
         self.attack_button = Button((100, 620, 150, 50), "Attack", self.font)
         self.skill_button = Button((270, 620, 150, 50), "Skill", self.font)
+        self.item_button = Button((440, 620, 150, 50), "Item", self.font)
+        self.run_button = Button((610, 620, 150, 50), "Run", self.font)
+
+        self.wind_swing_button = Button((100, 620, 150, 50), "Wind Swing", self.font)
+        self.back_button = Button((270, 620, 150, 50), "Back", self.font)
 
         self.turn = "player"
+        player.learn_skill(WIND_SWING)
 
         self.battle_log = []
 
@@ -94,8 +104,14 @@ class BattleScene:
         )
         self.screen.blit(monster_hp_text, (750, 300))
 
-        self.attack_button.draw(self.screen)
-        self.skill_button.draw(self.screen)
+        if self.menu == "main":
+            self.attack_button.draw(self.screen)
+            self.skill_button.draw(self.screen)
+            self.item_button.draw(self.screen)
+            self.run_button.draw(self.screen)
+        elif self.menu == "skills":
+            self.wind_swing_button.draw(self.screen)
+            self.back_button.draw(self.screen)
 
         turn_text = self.font.render(
             f"{self.turn.upper()} TURN",
@@ -109,13 +125,29 @@ class BattleScene:
 
     def handle_event(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN:
-            if self.attack_button.is_clicked(event):
-                if self.turn == "player":
-                    self.player.attack_target(self.monster)
-                    self.add_log(f"{self.player.name} attacks {self.monster.name}!")
-                    if not self.monster.life:
-                        return
-                    self.turn = "monster"
+            if self.menu == "main":
+                if self.attack_button.is_clicked(event):
+                    if self.turn == "player":
+                        self.player.attack_target(self.monster)
+                        self.add_log(f"{self.player.name} attacks {self.monster.name}!")
+                        if not self.monster.life:
+                            return
+                        self.turn = "monster"
+                if self.skill_button.is_clicked(event):
+                    self.menu = "skills"
+                    return
+            if self.menu == "skills":
+                if self.wind_swing_button.is_clicked(event):
+                    if self.turn == "player":
+                        self.player.use_skill(WIND_SWING, [self.monster], "enemy")
+                        self.add_log(f"{self.player.name} attacks Wind Swing!")
+                        if not self.monster.life:
+                            return
+                        self.turn = "monster"
+                if self.back_button.is_clicked(event):
+                    self.menu = "main"
+                    return
+                
                     
     def monster_turn(self):
         self.monster.attack(self.player)
