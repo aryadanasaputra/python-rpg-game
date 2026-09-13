@@ -3,6 +3,7 @@ from game.battle_scene import BattleScene
 from systems.player import Character
 from systems.monster import Monster
 from systems.party import Party
+from systems.skills.knight import WIND_SWING, RISING_SHIELD
 
 class Game:
     def __init__(self):
@@ -17,6 +18,9 @@ class Game:
 
         self.player = Character("Arya", "Knight", level=2)
         self.monster = Monster("Kobold", level=3)
+
+        self.player.learn_skill(WIND_SWING)
+        self.player.learn_skill(RISING_SHIELD)
 
         self.battle_scene = BattleScene(self.screen, self.player, self.monster)
 
