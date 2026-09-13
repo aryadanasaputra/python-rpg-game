@@ -61,6 +61,17 @@ def draw_battle_log(screen, font, battle_log):
 
         y += 30
 
+def create_skill_buttons(skills, font):
+    # Dictionary skill
+    buttons = {}
+    x=100
+    y=620
+
+    for skill in skills:
+        buttons[skill] = Button((x, y, 150, 50), skill.name, font)
+        x += 170
+    return buttons
+
 class Button:
     def __init__(self, rect, text, font, background_color=(100, 100, 100), text_color=(255, 255, 255)):
         self.rect = pygame.Rect(rect)
