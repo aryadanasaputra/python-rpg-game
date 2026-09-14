@@ -42,6 +42,8 @@ class StatusEffect:
         if self.damage > 0:
             print(f"{target.name} takes {self.damage} damage from {self.name}.")
             target.health = max(0, target.health - self.damage)
+            if target.health == 0:
+                print(f"{target.name} died cause {self.name}.")
         if self.health_regen > 0:
             print(f"{target.name} regenerates {self.health_regen} health from {self.name}.")
             self.restore_health(target, self.health_regen)
