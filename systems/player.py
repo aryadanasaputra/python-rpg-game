@@ -107,11 +107,14 @@ class Character:
         return int(100 * (1 + (self.level - 1) ** 1.5))
 
     def gain_experience(self, amount):
+        messages = []
         self.experience += amount
-        print(f"{self.name} gain {amount} EXP!")
+        messages.append(f"{self.name} gain {amount} EXP!")
         while self.experience >= self.experience_limit:
             self.experience -= self.experience_limit
-            self.level_up()
+            level_message = self.level_up()
+            messages.append(level_message)
+        return messages
 
     def level_up(self):
         growth  = ROLE_GROWTH[self.role]
@@ -128,7 +131,7 @@ class Character:
 
         self.experience_limit = self._calculate_experience_limit()
 
-        print(f"{self.name} has leveled up to level {self.level}!")
+        return f"{self.name} has leveled up to level {self.level}!"
 
     # VALIDATION
     def can_act(self):
@@ -295,9 +298,9 @@ class Character:
     def add_effect(self, effect):
         for existing_effect in self.effects:
             if existing_effect.name == effect.name:
-                extended_duration = existing_effect.duration + effect.duration
+                existing_effect.duration += effect.duration
                 print(f"{self.name}'s {effect.name} duration extended by {effect.duration} turns.")
-                print(f"{self.name}'s {effect.name} now {extended_duration} turn left.")
+                print(f"{self.name}'s {effect.name} now {existing_effect.duration} turn.")
                 return
         self.effects.append(effect)
         self.apply_effect_stat(effect)
@@ -350,7 +353,7 @@ class Character:
             effect.duration -= 1
             if effect.duration <= 0:
                 expired.append(effect)
-            print(f"{self.name}'s {effect.name.lower()} {effect.duration} left.")
+            print(f"{self.name}'s effect {effect.name.lower()} is {effect.duration} turns left.")
 
         for effect in (expired):
             self.remove_effect(effect)

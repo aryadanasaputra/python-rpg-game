@@ -61,6 +61,24 @@ def draw_battle_log(screen, font, battle_log):
 
         y += 30
 
+def draw_battle_result(result, screen, font, color=(255, 255, 255)):
+    # Get size screen
+    overlay = pygame.Surface(screen.get_size())
+    # Transparency
+    overlay.set_alpha(180)
+    # Color
+    overlay.fill((0, 0, 0))
+
+    # Display Overlay Screen
+    screen.blit(overlay, (0, 0))
+
+    # Create Text
+    result_text = font.render(result, True, color)
+
+    text_rect = result_text.get_rect(center=(screen.get_width() // 2, 350))
+
+    screen.blit(result_text, text_rect)    
+
 def create_skill_buttons(skills, font):
     # Dictionary skill
     buttons = {}
