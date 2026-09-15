@@ -5,7 +5,7 @@ from systems.equipments.accessory import Accessory
 
 ROLE_STATS = {
     "Knight": {
-        "max_health": 125,
+        "max_health": 25,
         "max_mana": 25,
         "attack": 15,
         "defense": 10
@@ -95,7 +95,8 @@ class Character:
 
         if self.health <= 0:
             self.life = False
-            print(f"{self.name} has died.")
+            return f"{self.name} has died."
+        return None
 
     # PROGRESSION
     def _calculate_stat_growth(self, stat, growth_stat):
@@ -268,20 +269,31 @@ class Character:
     # COMBAT
     def resolve_attack(self, target, attack_value, roll, miss=4, crit=18):
         if roll < miss:
-            print(f"{self.name}'s attack missed {target.name}!")
-            return "miss"
+            return {
+                "result": "miss",
+                "damage": 0,
+                "message": f"{self.name}'s attack missed {target.name}!"
+            }
         elif roll <= crit:
             damage = max(1, attack_value - target.defense)
             target.health -= damage
-            print(f"{self.name} attacks {target.name} and causes {damage} damage.")
-            target.status()
-            return "hit"
+            status = target.status()
+            return {
+                "result": "hit",
+                "damage": damage,
+                "status": status,
+                "message": f"{self.name} attacks {target.name} and causes {damage} damage."
+            }
         elif roll > crit:
             damage = max(1, (attack_value - target.defense) * 2)
             target.health -= damage
-            print(f"{self.name} lands a critical hit on {target.name} and causes {damage} damage!")
-            target.status()
-            return "critical"
+            status = target.status()
+            return {
+                "result": "critical",
+                "damage": damage,
+                "status": status,
+                "message": f"{self.name} lands a critical hit on {target.name} and causes {damage} damage!"
+            }
         
     def attack_target(self, target):
         if not self.can_act():
@@ -290,9 +302,11 @@ class Character:
             return False
         roll = random.randint(1, 20)
         attack_value = self.attack + roll
-        print(f"{self.name} rolls a {roll} for attack, total attack value: {attack_value}.")
-        self.resolve_attack(target, attack_value, roll)
-        return True
+
+        result = self.resolve_attack(target, attack_value, roll)
+        result["roll"] = roll
+        result["attack_value"] = attack_value
+        return result
 
     # COMBAT EFFECT
     def add_effect(self, effect):

@@ -11,7 +11,7 @@ class BattleScene:
         self.menu = "main"
 
         # Set font
-        self.font_big = pygame.font.Font(None, 54)
+        self.font_big = pygame.font.Font("assets/static/Oswald-Bold.ttf", 54)
         self.font = pygame.font.Font(None, 36)
         self.font_small = pygame.font.Font(None, 24)
 
@@ -24,12 +24,19 @@ class BattleScene:
         # Generate Skill Button
         self.skill_buttons = create_skill_buttons(self.player.skills, self.font_small)
 
+        self.continue_button = Button((400, 400, 200, 50), "Continue", self.font)
+        self.retry_button = Button((330, 400, 150, 50), "Retry", self.font)
+        self.exit_button = Button((500, 400, 150, 50), "Exit", self.font)
+
         self.battle_state = "playing"
         self.turn = "player"
 
         self.battle_log = []
 
     def check_battle_result(self):
+        if self.battle_state != "playing":
+            return True
+        
         if not self.monster.life:
             self.battle_state = "victory"
             self.give_reward()
@@ -138,18 +145,39 @@ class BattleScene:
 
         if self.battle_state == "victory":
             draw_battle_result("VICTORY", self.screen, self.font_big)
+            self.continue_button.draw(self.screen)
         elif self.battle_state == "defeat":
             draw_battle_result("DEFEAT", self.screen, self.font_big, color=(255, 0, 0))
+            self.retry_button.draw(self.screen)
+            self.exit_button.draw(self.screen)
 
     def handle_event(self, event):
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if self.battle_state == "victory":
+                if self.continue_button.is_clicked(event):
+                    print("Continue clicked")
+                    return
+            if self.battle_state == "defeat":
+                if self.retry_button.is_clicked(event):
+                    self.retry_battle()
+                    return
+                if self.exit_button.is_clicked(event):
+                    print("Exit clicked")
+                    return
         if self.battle_state != "playing":
             return
+        
         if event.type == pygame.MOUSEBUTTONDOWN:
             if self.menu == "main":
                 if self.attack_button.is_clicked(event):
                     if self.turn == "player":
-                        self.player.attack_target(self.monster)
-                        self.add_log(f"{self.player.name} attacks {self.monster.name}!")
+                        result = self.player.attack_target(self.monster)
+                        if result is None:
+                            return
+                        self.add_log(f"{self.player.name} rolls {result['roll']}.")
+                        self.add_log(result["message"])
+                        if result.get("status") is not None:
+                            self.add_log(result["status"])
                         if self.check_battle_result():
                             return
                         self.end_player_turn()
@@ -189,8 +217,12 @@ class BattleScene:
                 
                     
     def monster_turn(self):
-        self.monster.attack(self.player)
-        self.add_log(f"{self.monster.name} attacks {self.player.name}!")
+        result = self.monster.attack(self.player)
+        if result is None:
+            return
+        self.add_log(result["message"])
+        if result.get("status") is not None:
+            self.add_log(result["status"])
         if self.check_battle_result():
             return
         self.end_monster_turn()
@@ -216,3 +248,17 @@ class BattleScene:
         messages = self.player.gain_experience(reward)
         for message in messages:
             self.add_log(message)
+
+    def retry_battle(self):
+        self.player.health = self.player.max_health
+        self.player.mana = self.player.max_mana
+        self.player.life = True
+
+        self.monster.health = self.monster.max_health
+        self.monster.life = True
+
+        self.battle_state = "playing"
+        self.turn = "player"
+        self.menu = "main"
+        self.battle_log.clear()
+

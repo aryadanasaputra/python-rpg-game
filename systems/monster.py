@@ -73,7 +73,8 @@ class Monster:
     
         if self.health <= 0:
             self.life = False
-            print(f"{self.name} has died.")
+            return f"{self.name} has died."
+        return None
 
     def get_drop(self):
         if self.drop_item is None:
@@ -84,20 +85,35 @@ class Monster:
 
     def resolve_attack(self, player, attack_value, roll,  miss=5, crit=18):
         if roll < miss:
-            print(f"{self.name}'s attack missed!")
-            return
+            return {
+                "result": "miss",
+                "damage": 0,
+                "message": f"{self.name}'s attack missed {player.name}!"
+            }
         elif roll <= crit:
             damage = max(1, attack_value - player.defense)
             player.health -= damage
             print(f"{self.name} attacks {player.name} and causes {damage} damage!")
             self.attack_effect(player)
-            player.status()
+            status = player.status()
+            return {
+                "result": "hit",
+                "damage": damage,
+                "status": status,
+                "message": f"{self.name} attacks {player.name} and causes {damage} damage."
+            }
+            
         else:
             damage = max(1,(attack_value - player.defense) * 2)
             player.health -= damage
             print(f"{self.name} lands a critical hit on {player.name} and causes {damage} damage!")
-            self.attack_effect(player)
-            player.status()
+            status = player.status()
+            return {
+                "result": "critical",
+                "damage": damage,
+                "status": status,
+                "message": f"{self.name} lands a critical hit on {player.name} and causes {damage} damage!"
+            }
 
     def attack(self, player):
         if not self.life:
@@ -107,7 +123,8 @@ class Monster:
 
         roll = random.randint(1, 20)
         attack_value = self.attack_power + roll
-        self.resolve_attack(player, attack_value, roll)
+        result = self.resolve_attack(player, attack_value, roll)
+        return result
 
     def attack_effect(self, player):
         if self.monster_effect is None:

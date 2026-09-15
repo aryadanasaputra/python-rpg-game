@@ -17,7 +17,7 @@ class Game:
         self.running = True
 
         self.player = Character("Arya", "Knight", level=2)
-        self.monster = Monster("Kobold", level=3, experience_reward=1000)
+        self.monster = Monster("Kobold", level=3)
 
         self.player.learn_skill(WIND_SWING)
         self.player.learn_skill(RISING_SHIELD)
