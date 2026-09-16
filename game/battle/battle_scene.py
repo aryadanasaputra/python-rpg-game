@@ -1,11 +1,13 @@
 import pygame # pyright: ignore[reportMissingImports]
 from game.ui import Button, draw_bar, draw_battle_log, create_skill_buttons, draw_battle_result
+from game.battle.battle_manager import BattleManager
 
 class BattleScene:
     def __init__(self, screen, player, monster):
         self.screen = screen
         self.player = player
         self.monster = monster
+        self.battle_manager = BattleManager(self.player, self.monster)
 
         # Set State Menu
         self.menu = "main"
@@ -28,28 +30,12 @@ class BattleScene:
         self.retry_button = Button((330, 400, 150, 50), "Retry", self.font)
         self.exit_button = Button((500, 400, 150, 50), "Exit", self.font)
 
-        self.battle_state = "playing"
-        self.turn = "player"
+        self.next_scene = None
 
-        self.battle_log = []
-
-    def check_battle_result(self):
-        if self.battle_state != "playing":
-            return True
-        
-        if not self.monster.life:
-            self.battle_state = "victory"
-            self.give_reward()
-            return True
-
-        if not self.player.life:
-            self.battle_state = "defeat"
-            return True
-        return False
 
     def update(self):
-        if self.turn =="monster":
-            self.monster_turn()
+        if self.battle_manager.turn =="monster":
+            self.battle_manager.monster_turn()
 
     def draw(self):
         self.screen.fill((30, 30, 30))
@@ -134,53 +120,47 @@ class BattleScene:
             self.back_button.draw(self.screen)
 
         turn_text = self.font.render(
-            f"{self.turn.upper()} TURN",
+            f"{self.battle_manager.turn.upper()} TURN",
             True,
             (255, 255, 255)
         )
 
         self.screen.blit(turn_text, (400, 50))
 
-        draw_battle_log(self.screen, self.font_small, self.battle_log)
+        draw_battle_log(self.screen, self.font_small, self.battle_manager.battle_log)
 
-        if self.battle_state == "victory":
+        if self.battle_manager.battle_state == "victory":
             draw_battle_result("VICTORY", self.screen, self.font_big)
             self.continue_button.draw(self.screen)
-        elif self.battle_state == "defeat":
+        elif self.battle_manager.battle_state == "defeat":
             draw_battle_result("DEFEAT", self.screen, self.font_big, color=(255, 0, 0))
             self.retry_button.draw(self.screen)
             self.exit_button.draw(self.screen)
 
     def handle_event(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN:
-            if self.battle_state == "victory":
+            if self.battle_manager.battle_state == "victory":
                 if self.continue_button.is_clicked(event):
-                    print("Continue clicked")
+                    self.next_scene = "world"
                     return
-            if self.battle_state == "defeat":
+            if self.battle_manager.battle_state == "defeat":
                 if self.retry_button.is_clicked(event):
-                    self.retry_battle()
+                    self.battle_manager.retry_battle()
+                    self.menu = "main"
                     return
                 if self.exit_button.is_clicked(event):
-                    print("Exit clicked")
+                    self.next_scene = "exit"
                     return
-        if self.battle_state != "playing":
+        if self.battle_manager.battle_state != "playing":
             return
         
         if event.type == pygame.MOUSEBUTTONDOWN:
             if self.menu == "main":
                 if self.attack_button.is_clicked(event):
-                    if self.turn == "player":
-                        result = self.player.attack_target(self.monster)
+                    if self.battle_manager.turn == "player":
+                        result = self.battle_manager.player_attack()
                         if result is None:
                             return
-                        self.add_log(f"{self.player.name} rolls {result['roll']}.")
-                        self.add_log(result["message"])
-                        if result.get("status") is not None:
-                            self.add_log(result["status"])
-                        if self.check_battle_result():
-                            return
-                        self.end_player_turn()
                         return
                 if self.skill_button.is_clicked(event):
                     self.menu = "skills"
@@ -190,75 +170,16 @@ class BattleScene:
             if self.menu == "skills":
                 for skill, button in self.skill_buttons.items():
                     if button.is_clicked(event):
-                        if self.turn == "player":
-                            targets = []
-                            if skill.damage > 0:
-                                targets = [self.monster]
-                            effect_targets = []
-                            if skill.effect is not None:
-                                if skill.effect_target == "self":
-                                    effect_targets = [self.player]
-                                elif skill.effect_target == "enemy":
-                                    effect_targets = [self.monster]
-
-                            success = self.player.use_skill(skill, targets, effect_targets)
-                            if not success:
-                                return
-                            self.add_log(f"{self.player.name} uses {skill.name}!")
-                            if self.check_battle_result():
-                                return
-                            self.menu = "main"
-                            self.end_player_turn()
+                        if self.battle_manager.turn != "player":
                             return
+                        success = self.battle_manager.use_skill(skill)
+                        if not success:
+                            return
+                        self.menu = "main"
                         return
                 if self.back_button.is_clicked(event):
                     self.menu = "main"
                     return
-                
-                    
-    def monster_turn(self):
-        result = self.monster.attack(self.player)
-        if result is None:
-            return
-        self.add_log(result["message"])
-        if result.get("status") is not None:
-            self.add_log(result["status"])
-        if self.check_battle_result():
-            return
-        self.end_monster_turn()
 
-    def add_log(self, message):
-        self.battle_log.append(message)
 
-    def end_player_turn(self):
-        self.player.process_effect()
-        if not self.monster.life:
-            return
-        self.turn = "monster"
-
-    def end_monster_turn(self):
-        self.monster.process_effect()
-        if not self.player.life:
-            return
-        self.turn = "player"
-
-    def give_reward(self):
-        reward = self.monster.experience_reward
-
-        messages = self.player.gain_experience(reward)
-        for message in messages:
-            self.add_log(message)
-
-    def retry_battle(self):
-        self.player.health = self.player.max_health
-        self.player.mana = self.player.max_mana
-        self.player.life = True
-
-        self.monster.health = self.monster.max_health
-        self.monster.life = True
-
-        self.battle_state = "playing"
-        self.turn = "player"
-        self.menu = "main"
-        self.battle_log.clear()
 

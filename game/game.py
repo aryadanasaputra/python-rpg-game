@@ -1,5 +1,5 @@
 import pygame  # pyright: ignore[reportMissingImports]
-from game.battle_scene import BattleScene
+from game.battle.battle_scene import BattleScene
 from systems.player import Character
 from systems.monster import Monster
 from systems.party import Party
@@ -23,6 +23,7 @@ class Game:
         self.player.learn_skill(RISING_SHIELD)
 
         self.battle_scene = BattleScene(self.screen, self.player, self.monster)
+        self.current_scene = self.battle_scene
 
     def run(self):
         while self.running:
@@ -38,12 +39,16 @@ class Game:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.running = False
+                return
 
-            self.battle_scene.handle_event(event)
+            self.current_scene.handle_event(event)
+            if self.current_scene.next_scene == "exit":
+                self.running = False
+                return
 
     def update(self):
-        self.battle_scene.update()
+        self.current_scene.update()
 
     def draw(self):
-        self.battle_scene.draw()
+        self.current_scene.draw()
         pygame.display.flip()
