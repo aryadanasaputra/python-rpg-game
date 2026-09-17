@@ -6,7 +6,7 @@ from systems.party import Party
 from systems.skills.knight import WIND_SWING, RISING_SHIELD
 
 class Game:
-    def __init__(self):
+    def __init__(self, party, monsters):
         pygame.init()
 
         self.screen = pygame.display.set_mode((1000, 700))
@@ -16,13 +16,10 @@ class Game:
 
         self.running = True
 
-        self.player = Character("Arya", "Knight", level=2)
-        self.monster = Monster("Kobold", level=3)
+        self.party = party
+        self.monsters = monsters
 
-        self.player.learn_skill(WIND_SWING)
-        self.player.learn_skill(RISING_SHIELD)
-
-        self.battle_scene = BattleScene(self.screen, self.player, self.monster)
+        self.battle_scene = BattleScene(self.screen, self.party, self.monsters)
         self.current_scene = self.battle_scene
 
     def run(self):

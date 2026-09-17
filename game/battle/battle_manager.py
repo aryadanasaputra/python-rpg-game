@@ -1,11 +1,16 @@
 class BattleManager:
-    def __init__(self, player, monster):
-        self.player = player
+    def __init__(self, party, monster):
+        self.party = party
+        self.player = party.characters[0]
         self.monster = monster
         self.battle_log = []
 
         self.battle_state = "playing"
         self.turn = "player"
+
+    def update(self):
+        if self.turn == "monster":
+            self.monster_turn()
 
     def check_battle_result(self):
         if self.battle_state != "playing":
@@ -46,16 +51,30 @@ class BattleManager:
             return
         self.turn = "player"
 
+    def use_item(self, item):
+        targets = [self.player]
+        result = self.party.use_item(item, targets)
+        if not result["success"]:
+            for message in result["messages"]:
+                self.add_log(message)
+            return False
+        for message in result["messages"]:
+            self.add_log(message)
+        if self.check_battle_result():
+            return True
+        self.end_player_turn()
+        return True
+
     def player_attack(self):
         result = self.player.attack_target(self.monster)
         if result is None:
-            return
-        if self.check_battle_result():
             return
         self.add_log(f"{self.player.name} rolls {result['roll']}.")
         self.add_log(result["message"])
         if result.get("status") is not None:
             self.add_log(result["status"])
+        if self.check_battle_result():
+            return
         self.end_player_turn()
 
     def use_skill(self, skill):

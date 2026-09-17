@@ -82,11 +82,22 @@ def draw_battle_result(result, screen, font, color=(255, 255, 255)):
 def create_skill_buttons(skills, font):
     # Dictionary skill
     buttons = {}
-    x=100
+    x=270
     y=620
 
     for skill in skills:
         buttons[skill] = Button((x, y, 150, 50), skill.name, font)
+        x += 170
+    return buttons
+
+def create_item_buttons(item_inventory, font):
+    buttons = {}
+    x=270
+    y=620
+
+    for item, amount in item_inventory.items():
+        text = f"{item.name} x{amount}"
+        buttons[item] = Button((x, y, 150, 50), text, font)
         x += 170
     return buttons
 

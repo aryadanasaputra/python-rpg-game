@@ -36,13 +36,17 @@ class Party:
     def use_item(self, item, targets):
         if item not in self.item_inventory:
             print(f"Party doesn't have {item.name}.")
-            return False
+            return {
+                "success": False,
+                "messages": f"Party doesn't have {item.name}."
+            }
 
         effect_targets = targets if targets is not None else []
+        messages = []
 
         if item.type.lower() == "potion":
             for target in targets:
-                print(f"{target.name} uses {item.name}")
+                messages.append(f"{target.name} uses {item.name}")
                 old_health = target.health
                 old_mana = target.mana
                 target.health = min(target.max_health,target.health + item.health_restore)
@@ -50,19 +54,24 @@ class Party:
                 actual_health = target.health - old_health
                 actual_mana = target.mana - old_mana
                 if item.health_restore > 0:
-                    print(f"{target.name} restored {actual_health} HP.")
+                    messages.append(f"{target.name} restored {actual_health} HP.")
                 if item.mana_restore > 0:
-                    print(f"{target.name} restored {actual_mana} MP.")
+                    messages.append(f"{target.name} restored {actual_mana} MP.")
                 
             self.add_item_effect(item, effect_targets)
             self.item_inventory[item] -= 1
 
             if self.item_inventory[item] <= 0:
                 del self.item_inventory[item]
-            print(f"Party used {item.name}")
-            return True
+            return {
+                "success": False,
+                "messages": messages
+            }
             
-        return False
+        return {
+                "success": False,
+                "messages": []
+            }
 
     def add_item_effect(self, item, effect_target):
         if item.effect is None:
