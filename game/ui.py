@@ -77,8 +77,34 @@ def draw_battle_result(result, screen, font, color=(255, 255, 255)):
 
     text_rect = result_text.get_rect(center=(screen.get_width() // 2, 350))
 
-    screen.blit(result_text, text_rect)    
+    screen.blit(result_text, text_rect)
 
+def draw_run(screen, font):
+    dark_overlay = pygame.Surface(screen.get_size(), pygame.SRCALPHA)
+    dark_overlay.fill((0, 0, 0, 180))
+    screen.blit(dark_overlay, (0, 0))
+
+    panel = pygame.Surface((500, 250), pygame.SRCALPHA)
+    panel.fill((30, 30, 30, 255))
+
+    panel_rect = panel.get_rect(
+        center=screen.get_rect().center
+    )
+
+    screen.blit(panel, panel_rect)
+
+    text = font.render(
+        "Are you sure?",
+        True,
+        (255, 255, 255)
+    )
+
+    text_rect = text.get_rect(
+        center=(panel_rect.centerx, panel_rect.top + 75)
+    )
+
+    screen.blit(text, text_rect)
+    
 def create_skill_buttons(skills, font):
     # Dictionary skill
     buttons = {}

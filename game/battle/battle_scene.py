@@ -1,5 +1,5 @@
 import pygame # pyright: ignore[reportMissingImports]
-from game.ui import Button, draw_bar, draw_battle_log, create_skill_buttons, create_item_buttons, draw_battle_result
+from game.ui import Button, draw_bar, draw_battle_log, create_skill_buttons, create_item_buttons, draw_battle_result, draw_run
 from game.battle.battle_manager import BattleManager
 
 class BattleScene:
@@ -29,6 +29,8 @@ class BattleScene:
         self.item_buttons = {}
 
         self.continue_button = Button((400, 400, 200, 50), "Continue", self.font)
+        self.run_yes_button = Button((330, 400, 150, 50), "Yes", self.font)
+        self.run_no_button = Button((500, 400, 150, 50), "No", self.font)
         self.retry_button = Button((330, 400, 150, 50), "Retry", self.font)
         self.exit_button = Button((500, 400, 150, 50), "Exit", self.font)
 
@@ -109,6 +111,7 @@ class BattleScene:
             (255, 255, 255)
         )
         self.screen.blit(monster_hp_text, (750, 300))
+        draw_battle_log(self.screen, self.font_small, self.battle_manager.battle_log)
 
         if self.menu == "main":
             self.attack_button.draw(self.screen)
@@ -123,6 +126,10 @@ class BattleScene:
             for button in self.item_buttons.values():
                 button.draw(self.screen)
             self.back_button.draw(self.screen)
+        elif self.menu == "run":
+            draw_run(self.screen, self.font_big)
+            self.run_yes_button.draw(self.screen)
+            self.run_no_button.draw(self.screen)
 
         turn_text = self.font.render(
             f"{self.battle_manager.turn.upper()} TURN",
@@ -132,7 +139,6 @@ class BattleScene:
 
         self.screen.blit(turn_text, (400, 50))
 
-        draw_battle_log(self.screen, self.font_small, self.battle_manager.battle_log)
 
         if self.battle_manager.battle_state == "victory":
             draw_battle_result("VICTORY", self.screen, self.font_big)
@@ -175,6 +181,7 @@ class BattleScene:
                     self.item_buttons = create_item_buttons(self.party.item_inventory, self.font_small)
                     return
                 if self.run_button.is_clicked(event):
+                    self.menu = "run"
                     return
             if self.menu == "skills":
                 for skill, button in self.skill_buttons.items():
@@ -197,6 +204,13 @@ class BattleScene:
                         self.menu = "main"
                         return
                 if self.back_button.is_clicked(event):
+                    self.menu = "main"
+                    return
+            if self.menu == "run":
+                if self.run_yes_button.is_clicked(event):
+                    self.next_scene = "exit"
+                    return
+                if self.run_no_button.is_clicked(event):
                     self.menu = "main"
                     return
             
