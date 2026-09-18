@@ -37,27 +37,29 @@ class StatusEffect:
             self.restore_mana(target, self.mana_bonus)
 
     def process(self, target):
+        messages = []
         if not target.life:
             return
         if self.damage > 0:
-            print(f"{target.name} takes {self.damage} damage from {self.name}.")
+            messages.append(f"{target.name} takes {self.damage} damage from {self.name}.")
             target.health = max(0, target.health - self.damage)
             if target.health == 0:
-                print(f"{target.name} died cause {self.name}.")
+                messages.append(f"{target.name} died cause {self.name}.")
         if self.health_regen > 0:
-            print(f"{target.name} regenerates {self.health_regen} health from {self.name}.")
+            messages.append(f"{target.name} regenerates {self.health_regen} health from {self.name}.")
             self.restore_health(target, self.health_regen)
         if self.mana_regen > 0:
-            print(f"{target.name} regenerates {self.mana_regen} mana from {self.name}.")
+            messages.append(f"{target.name} regenerates {self.mana_regen} mana from {self.name}.")
             self.restore_mana(target, self.mana_regen)
         if self.health_regen_percent > 0:
             regen_amount = int(target.max_health * self.health_regen_percent)
-            print(f"{target.name} regenerates {regen_amount} health from {self.name}.")
+            messages.append(f"{target.name} regenerates {regen_amount} health from {self.name}.")
             self.restore_health(target, regen_amount)
         if self.mana_regen_percent > 0:
             regen_amount = int(target.max_mana * self.mana_regen_percent)
-            print(f"{target.name} regenerates {regen_amount} mana from {self.name}.")
+            messages.append(f"{target.name} regenerates {regen_amount} mana from {self.name}.")
             self.restore_mana(target, regen_amount)
+        return messages
             
     def restore_health(self, target, amount):
         old_health = target.health

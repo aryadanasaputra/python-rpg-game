@@ -40,7 +40,9 @@ class BattleManager:
         self.end_monster_turn()    
 
     def end_player_turn(self):
-        self.player.process_effect()
+        messages = self.player.process_effect()
+        for message in messages:
+            self.add_log(message)
         if not self.monster.life:
             return
         self.turn = "monster"
@@ -88,10 +90,11 @@ class BattleManager:
             elif skill.effect_target == "enemy":
                 effect_targets = [self.monster]
         
-        success = self.player.use_skill(skill, targets, effect_targets)
-        if not success:
+        result = self.player.use_skill(skill, targets, effect_targets)
+        for message in result.get("messages", []):
+            self.add_log(message)
+        if not result.get("success", False):
             return False
-        self.add_log(f"{self.player.name} uses {skill.name}!")
         if self.check_battle_result():
             return True
         self.end_player_turn()

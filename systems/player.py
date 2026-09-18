@@ -173,24 +173,25 @@ class Character:
     def learn_skill(self, skill):
         if skill not in self.skills:
             self.skills.append(skill)
-            print(f"{self.name} learned {skill.name}")
+            return f"{self.name} learned {skill.name}"
         else:
-            print(f"{self.name} already knows {skill.name}")
+            return f"{self.name} already knows {skill.name}"
 
     def use_skill(self, skill, targets, effect_targets=None):
         if not self.can_use_skill(skill):
-            return False
+            return {"success": False}
 
         effect_targets = effect_targets if effect_targets is not None else []
         successful_targets = []
+        messages = []
             
         self.mana -= skill.mana_cost
-        print(f"{self.name} using skill name {skill.name}")
+        messages.append(f"{self.name} using skill name {skill.name}")
 
         if skill.damage > 0:
             roll = random.randint(1, 20)
             attack_value = self.attack + skill.damage + roll
-            print(f"{self.name} rolls a {roll} for skill, total value: {attack_value}.")
+            messages.append(f"{self.name} rolls a {roll} for skill, total value: {attack_value}.")
             for target in targets:
                 result = self.resolve_attack(target, attack_value, roll)
                 if result != "miss":
@@ -199,7 +200,7 @@ class Character:
         if skill.defense > 0:
             for target in targets:
                 target.defense += skill.defense
-                print(f"{self.name} increases defense by {skill.defense} (now {target.defense}).")
+                messages.append(f"{self.name} increases defense by {skill.defense} (now {target.defense}).")
 
         if skill.heal > 0:
             for target in targets:
@@ -207,7 +208,7 @@ class Character:
                 old_hp = target.health
                 target.health = min(target.max_health, target.health + healing)
                 actual_healed = target.health - old_hp
-                print(f"{self.name} heals {actual_healed} HP (now {target.health}/{target.max_health}).")
+                messages.append(f"{self.name} heals {actual_healed} HP (now {target.health}/{target.max_health}).")
 
         if skill.effect is not None:
             if skill.damage > 0 and skill.effect_target == skill.target_type:
@@ -215,20 +216,26 @@ class Character:
             else:
                 effect_targets_to_apply = effect_targets
 
-            self.add_skill_effect(skill, effect_targets_to_apply)
-        return True
+            messages.extend(self.add_skill_effect(skill, effect_targets_to_apply))
+        return {
+                "success": True,
+                "messages": messages
+            }
 
     def add_skill_effect(self, skill, effect_targets):
+        messages = []
         if skill.effect is None:
-            return
+            return messages
         for target in effect_targets:
             if not target.life:
-                print(f"{target.name} is already dead and cannot be affected by {skill.effect.name}.")
+                messages.append(f"{target.name} is already dead and cannot be affected by {skill.effect.name}.")
                 continue
 
             effect = skill.effect.copy()
             effect.apply_immediate_effect(target)
-            target.add_effect(effect)
+            messages.extend(target.add_effect(effect))
+            messages.append(f"{target.name} receives {effect.name}")
+        return messages
 
     # EQUIPMENT
     def _apply_equipment_stats(self, equipment, multiplier):
@@ -310,30 +317,31 @@ class Character:
 
     # COMBAT EFFECT
     def add_effect(self, effect):
+        messages = []
         for existing_effect in self.effects:
             if existing_effect.name == effect.name:
                 existing_effect.duration += effect.duration
-                print(f"{self.name}'s {effect.name} duration extended by {effect.duration} turns.")
-                print(f"{self.name}'s {effect.name} now {existing_effect.duration} turn.")
-                return
+                messages.append(f"{self.name}'s {effect.name} duration extended by {effect.duration} turns, now {existing_effect.duration} turn left.")
+                return messages
         self.effects.append(effect)
         self.apply_effect_stat(effect)
-        print(f"{self.name} is effected by {effect.name}")
+        messages.append(f"{self.name} is effected by {effect.name}")
         if effect.attack_bonus > 0:
-            print(f"{self.name} increases attack by {effect.attack_bonus}.")
+            messages.append(f"{self.name} increases attack by {effect.attack_bonus}.")
         elif effect.attack_bonus < 0:
-            print(f"{self.name} decreases attack by {effect.attack_bonus}.")
+            messages.append(f"{self.name} decreases attack by {effect.attack_bonus}.")
 
         if effect.defense_bonus > 0:
-            print(f"{self.name} increases defense by {effect.defense_bonus}.")
+            messages.append(f"{self.name} increases defense by {effect.defense_bonus}.")
         elif effect.defense_bonus < 0:
-            print(f"{self.name} decreases defense by {effect.defense_bonus}.")
+            messages.append(f"{self.name} decreases defense by {effect.defense_bonus}.")
 
         if effect.max_health_bonus > 0:
-            print(f"{self.name} increases maximum health by {effect.max_health_bonus}.")
+            messages.append(f"{self.name} increases maximum health by {effect.max_health_bonus}.")
 
         if effect.max_mana_bonus > 0:
-            print(f"{self.name} increases maximum mana by {effect.max_mana_bonus}.")
+            messages.append(f"{self.name} increases maximum mana by {effect.max_mana_bonus}.")
+        return messages
 
     def apply_effect_stat(self, effect):
         attack = self.attack + effect.attack_bonus
@@ -362,14 +370,18 @@ class Character:
     
     def process_effect(self):
         expired = []
+        messages = []
         for effect in (self.effects):
-            effect.process(self)
+            messages.extend(effect.process(self))
             effect.duration -= 1
             if effect.duration <= 0:
                 expired.append(effect)
-            print(f"{self.name}'s effect {effect.name.lower()} is {effect.duration} turns left.")
+            messages.append(f"{self.name}'s effect {effect.name.lower()} is {effect.duration} turns left.")
 
         for effect in (expired):
             self.remove_effect(effect)
+            messages.append(f"{self.name}'s {effect.name} has expired.")
+
+        return messages
 
 
