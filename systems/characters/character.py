@@ -56,12 +56,83 @@ class Character:
         
         return True
 
+    # SKILL
+    def learn_skill(self, skill):
+        if skill not in self.skills:
+            self.skills.append(skill)
+            return f"{self.name} learned {skill.name}"
+        else:
+            return f"{self.name} already knows {skill.name}"
+
+    def use_skill(self, skill, targets, effect_targets=None):
+        if not self.can_use_skill(skill):
+            return {"success": False}
+
+        effect_targets = effect_targets if effect_targets is not None else []
+        successful_targets = []
+        messages = []
+            
+        self.mana -= skill.mana_cost
+        messages.append(f"{self.name} using skill name {skill.name}")
+
+        if skill.damage > 0:
+            roll = random.randint(1, 20)
+            attack_value = self.attack + skill.damage + roll
+            # messages.append(f"{self.name} rolls a {roll} for skill, total value: {attack_value}.")
+            for target in targets:
+                result = self.resolve_attack(target, attack_value, roll)
+                messages.append(result["message"])
+                if result.get("status") is not None:
+                    messages.append(result["status"])
+                if result["result"] != "miss":
+                    successful_targets.append(target)
+
+        if skill.defense > 0:
+            for target in targets:
+                target.defense += skill.defense
+                # messages.append(f"{self.name} increases defense by {skill.defense} (now {target.defense}).")
+
+        if skill.heal > 0:
+            for target in targets:
+                healing = skill.heal
+                old_hp = target.health
+                target.health = min(target.max_health, target.health + healing)
+                actual_healed = target.health - old_hp
+                messages.append(f"{self.name} heals {actual_healed} HP (now {target.health}/{target.max_health}).")
+
+        if skill.effect is not None:
+            if skill.damage > 0 and skill.effect_target == skill.target_type:
+                effect_targets_to_apply = successful_targets
+            else:
+                effect_targets_to_apply = effect_targets
+            messages.extend(self.add_skill_effect(skill, effect_targets_to_apply))
+        return {
+                "success": True,
+                "messages": messages
+            }
+
+    def add_skill_effect(self, skill, effect_targets):
+        messages = []
+        if skill.effect is None:
+            return messages
+        for target in effect_targets:
+            if not target.life:
+                messages.append(f"{target.name} is already dead and cannot be affected by {skill.effect.name}.")
+                continue
+
+            effect = skill.effect.copy()
+            effect.apply_immediate_effect(target)
+            messages.extend(target.add_effect(effect))
+            # messages.append(f"{target.name} receives {effect.name}")
+        return messages
+
     # COMBAT
     def resolve_attack(self, target, attack_value, roll, miss=4, crit=18):
         if roll < miss:
             return {
                 "result": "miss",
                 "damage": 0,
+                "status": None,
                 "message": f"{self.name}'s attack missed {target.name}!"
             }
         elif roll <= crit:
@@ -86,10 +157,11 @@ class Character:
             }
         
     def attack_target(self, target):
+        messages = []
         if not self.can_act():
-            return False
+            return None
         if not self.can_target(target):
-            return False
+            return None
         roll = random.randint(1, 20)
         attack_value = self.attack + roll
 
