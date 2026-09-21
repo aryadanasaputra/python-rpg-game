@@ -29,15 +29,25 @@ class BattleManager:
         return False
 
     def monster_turn(self):
-        result = self.monster.attack_target(self.player)
-        if result is None:
-            return
-        self.add_log(result["message"])
-        if result.get("status") is not None:
-            self.add_log(result["status"])
         if self.check_battle_result():
             return
-        self.end_monster_turn()    
+
+        result = self.monster.attack_target(self.player)
+
+        if result is None:
+            self.check_battle_result()
+            return
+
+        self.add_log(result["message"])
+
+        status = result.get("status")
+        if status is not None:
+            self.add_log(status)
+
+        if self.check_battle_result():
+            return
+
+        self.end_monster_turn()  
 
     def end_player_turn(self):
         messages = self.player.process_effect()
@@ -48,7 +58,9 @@ class BattleManager:
         self.turn = "monster"
 
     def end_monster_turn(self):
-        self.monster.process_effect()
+        messages = self.monster.process_effect()
+        for message in messages:
+            self.add_log(message)
         if not self.player.life:
             return
         self.turn = "player"
