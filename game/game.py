@@ -1,7 +1,7 @@
 import pygame  # pyright: ignore[reportMissingImports]
 from game.battle.battle_scene import BattleScene
-from systems.player import Character
-from systems.monster import Monster
+from systems.characters.player import Character
+from systems.characters.monster import Monster
 from systems.party import Party
 from systems.skills.knight import WIND_SWING, RISING_SHIELD
 

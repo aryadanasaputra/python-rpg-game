@@ -1,7 +1,7 @@
 from game.game import Game
-import systems.player as player
+from systems.characters.player import Player
 from systems.party import Party
-import systems.monster as monster
+import systems.characters.monster as monster
 from systems.battle import Battle
 from systems.skills.knight import WIND_SWING, RISING_SHIELD, SHIELD_BASH, HEAL, BERSERK, INTIMIDATE
 from systems.skills.mage import IGNITE, FLAME_STRIKE, HEALING, GREATER_HEALING
@@ -12,8 +12,8 @@ from systems.equipments.weapon import WOODEN_LONG_SWORD, LEGENDARY_LONG_SWORD, L
 from systems.equipments.accessory import WOODEN_RING, GOLDEN_RING
 # from systems.effects.effect import POISON, BUFF
 
-p1 = player.Character("Arya", "Knight", level=2)
-p2 = player.Character("Eris", "Mage", level=1)
+p1 = Player("Arya", "Knight", level=2)
+p2 = Player("Eris", "Mage", level=1)
 
 m1 = monster.Monster("Goblin", level=1, drop_item=HEALTH_POTION)
 m2 = monster.Monster("Slime", level=2, drop_item=MANA_POTION)

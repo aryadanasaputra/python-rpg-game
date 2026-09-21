@@ -29,7 +29,7 @@ class BattleManager:
         return False
 
     def monster_turn(self):
-        result = self.monster.attack(self.player)
+        result = self.monster.attack_target(self.player)
         if result is None:
             return
         self.add_log(result["message"])
@@ -71,7 +71,6 @@ class BattleManager:
         result = self.player.attack_target(self.monster)
         if result is None:
             return
-        self.add_log(f"{self.player.name} rolls {result['roll']}.")
         self.add_log(result["message"])
         if result.get("status") is not None:
             self.add_log(result["status"])
