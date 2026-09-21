@@ -30,7 +30,6 @@ MONSTER_STATS = {
 }
 class Monster(Character):
     def __init__(self, name, level=1, experience_reward=100, gold_reward=10, drop_item=None, drop_chance=0.5, monster_effect=None, effect_chance=0.5):
-        self.name = name
         self.level = level
 
         base = MONSTER_STATS[name]
@@ -45,6 +44,7 @@ class Monster(Character):
         
         self.attack = int(base["attack"] * scale)
         self.defense = int(base["defense"] * scale)
+        super().__init__(name, self.max_health, self.max_mana, self.attack, self.defense)
         self.experience_reward = int(experience_reward * scale)
         self.gold_reward = int(gold_reward * scale)
         self.drop_item = drop_item
@@ -54,7 +54,7 @@ class Monster(Character):
         self.effect_chance = base.get("effect_chance")
         self.reward_given = False
 
-        self.effects = []
+        self.skills = []
 
         self.life = True
 
@@ -76,47 +76,15 @@ class Monster(Character):
             return self.drop_item
         return None
 
-    def resolve_attack(self, player, attack_value, roll,  miss=5, crit=18):
-        if roll < miss:
-            return {
-                "result": "miss",
-                "damage": 0,
-                "message": f"{self.name}'s attack missed {player.name}!"
-            }
-        elif roll <= crit:
-            damage = max(1, attack_value - player.defense)
-            player.health -= damage
-            print(f"{self.name} attacks {player.name} and causes {damage} damage!")
-            self.attack_effect(player)
-            status = player.status()
-            return {
-                "result": "hit",
-                "damage": damage,
-                "status": status,
-                "message": f"{self.name} attacks {player.name} and causes {damage} damage."
-            }
-            
-        else:
-            damage = max(1,(attack_value - player.defense) * 2)
-            player.health -= damage
-            print(f"{self.name} lands a critical hit on {player.name} and causes {damage} damage!")
-            status = player.status()
-            return {
-                "result": "critical",
-                "damage": damage,
-                "status": status,
-                "message": f"{self.name} lands a critical hit on {player.name} and causes {damage} damage!"
-            }
-
     def attack_target(self, player):
+        result = super().attack_target(player)
         if not self.life:
             return
         if not player.life:
             return
 
-        roll = random.randint(1, 20)
-        attack_value = self.attack + roll
-        result = self.resolve_attack(player, attack_value, roll)
+        if result["result"] != "miss":
+            self.attack_effect(player)
         return result
 
     def attack_effect(self, player):
