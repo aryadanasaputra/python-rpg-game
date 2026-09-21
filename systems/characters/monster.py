@@ -1,4 +1,5 @@
 import random
+from systems.characters.character import Character
 from systems.effects.effect import POISON, BLEEDING
 
 MONSTER_STATS = {
@@ -27,7 +28,7 @@ MONSTER_STATS = {
         "effect_chance": 0.6
     }
 }
-class Monster:
+class Monster(Character):
     def __init__(self, name, level=1, experience_reward=100, gold_reward=10, drop_item=None, drop_chance=0.5, monster_effect=None, effect_chance=0.5):
         self.name = name
         self.level = level
@@ -42,7 +43,7 @@ class Monster:
         self.max_mana = int(base["max_mana"] * scale)
         self.mana = self.max_mana
         
-        self.attack_power = int(base["attack"] * scale)
+        self.attack = int(base["attack"] * scale)
         self.defense = int(base["defense"] * scale)
         self.experience_reward = int(experience_reward * scale)
         self.gold_reward = int(gold_reward * scale)
@@ -63,18 +64,10 @@ class Monster:
         print(f"Level   : {self.level}")
         print(f"Health  : {self.health}/{self.max_health}")
         print(f"Mana    : {self.mana}/{self.max_mana}")
-        print(f"Attack  : {self.attack_power}")
+        print(f"Attack  : {self.attack}")
         print(f"Defense : {self.defense}")
         print(f"Status  : {'Life' if self.life else 'Dead'}")
         print("====================================")
-
-    def status(self):
-        self.health = max(0, self.health)
-    
-        if self.health <= 0:
-            self.life = False
-            return f"{self.name} has died."
-        return None
 
     def get_drop(self):
         if self.drop_item is None:
@@ -115,14 +108,14 @@ class Monster:
                 "message": f"{self.name} lands a critical hit on {player.name} and causes {damage} damage!"
             }
 
-    def attack(self, player):
+    def attack_target(self, player):
         if not self.life:
             return
         if not player.life:
             return
 
         roll = random.randint(1, 20)
-        attack_value = self.attack_power + roll
+        attack_value = self.attack + roll
         result = self.resolve_attack(player, attack_value, roll)
         return result
 
@@ -135,64 +128,4 @@ class Monster:
             effect = self.monster_effect.copy()
             effect.apply_immediate_effect(player)
             player.add_effect(effect)
-
-    def add_effect(self, effect):
-        for existing_effect in self.effects:
-            if existing_effect.name == effect.name:
-                existing_effect.duration += effect.duration
-                print(f"{self.name}'s {effect.name} duration extended by {effect.duration} turns.")
-                return
-        self.effects.append(effect)
-        self.apply_effect_stat(effect)
-        print(f"{self.name} is effected by {effect.name}")
-        if effect.attack_bonus > 0:
-            print(f"{self.name} increases attack by {effect.attack_bonus}.")
-        elif effect.attack_bonus < 0:
-            print(f"{self.name} decreases attack by {effect.attack_bonus}.")
-
-        if effect.defense_bonus > 0:
-            print(f"{self.name} increases defense by {effect.defense_bonus}.")
-        elif effect.defense_bonus < 0:
-            print(f"{self.name} decreases defense by {effect.defense_bonus}.")
-
-        if effect.max_health_bonus > 0:
-            print(f"{self.name} increases maximum health by {effect.max_health_bonus}.")
-        if effect.max_mana_bonus > 0:
-            print(f"{self.name} increases maximum mana by {effect.max_mana_bonus}.")
-
-    def apply_effect_stat(self, effect):
-        attack = self.attack_power + effect.attack_bonus
-        defense = self.defense + effect.defense_bonus
-        self.max_health += effect.max_health_bonus
-        self.max_mana += effect.max_mana_bonus
-
-        self.defense = max(0, defense)
-        self.attack_power = max(0, attack)
-        self.health = min(self.health, self.max_health)
-        self.mana = min(self.mana, self.max_mana)
-
-    def remove_effect_stat(self, effect):
-        self.attack_power -= effect.attack_bonus
-        self.defense -= effect.defense_bonus
-        self.max_health -= effect.max_health_bonus
-        self.max_mana -= effect.max_mana_bonus
-
-        self.health = min(self.health, self.max_health)
-        self.mana = min(self.mana, self.max_mana)
-
-    def remove_effect(self, effect):
-        self.remove_effect_stat(effect)
-        self.effects.remove(effect)
-        print(f"{self.name}'s {effect.name.lower()} has expired.")
-    
-    def process_effect(self):
-        expired = []
-        for effect in (self.effects):
-            effect.process(self)
-            effect.duration -= 1
-            if effect.duration <= 0:
-                expired.append(effect)
-
-        for effect in (expired):
-            self.remove_effect(effect)
 

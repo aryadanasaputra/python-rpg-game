@@ -43,7 +43,7 @@ class Party:
 
         effect_targets = targets if targets is not None else []
         messages = []
-
+ 
         if item.type.lower() == "potion":
             for target in targets:
                 messages.append(f"{target.name} uses {item.name}")
@@ -69,7 +69,7 @@ class Party:
             }
             
         return {
-                "success": False,
+                "success": True,
                 "messages": []
             }
 
