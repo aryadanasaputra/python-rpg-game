@@ -24,7 +24,6 @@ class Character:
     # VALIDATION
     def can_act(self):
         if not self.life:
-            print(f"{self.name} is dead and cannot act!")
             return False
         return True
 
@@ -157,18 +156,31 @@ class Character:
             }
         
     def attack_target(self, target):
-        messages = []
         if not self.can_act():
-            return None
+            return {
+                "success": False,
+                "messages": [f"{self.name} cannot act"]
+            }
         if not self.can_target(target):
-            return None
+            return {
+                "success": False,
+                "messages": [f"{self.name} cannot attack {target.name}"]
+            }
         roll = random.randint(1, 20)
         attack_value = self.attack + roll
 
         result = self.resolve_attack(target, attack_value, roll)
         result["roll"] = roll
         result["attack_value"] = attack_value
-        return result
+
+        return {
+            "success": True,
+            "messages": [
+                f"{self.name} rolls {roll}",
+                result["message"]
+            ],
+            "combat": result
+        }
 
     # COMBAT EFFECT
     def add_effect(self, effect):
@@ -198,13 +210,13 @@ class Character:
         return messages
 
     def apply_effect_stat(self, effect):
-        attack = self.attack + effect.attack_bonus
-        defense = self.defense + effect.defense_bonus
+        self.attack += effect.attack_bonus
+        self.defense += effect.defense_bonus
         self.max_health += effect.max_health_bonus
         self.max_mana += effect.max_mana_bonus
 
-        self.defense = max(0, defense)
-        self.attack = max(0, attack)
+        # self.defense = max(0, defense)
+        # self.attack = max(0, attack)
         self.health = min(self.health, self.max_health)
         self.mana = min(self.mana, self.max_mana)
 

@@ -37,10 +37,10 @@ class Monster(Character):
         scale = 1 + (level - 1) * 0.25
 
         self.max_health = int(base["max_health"] * scale)
-        self.health = self.max_health
+        # self.health = self.max_health
         
         self.max_mana = int(base["max_mana"] * scale)
-        self.mana = self.max_mana
+        # self.mana = self.max_mana
         
         self.attack = int(base["attack"] * scale)
         self.defense = int(base["defense"] * scale)
@@ -78,10 +78,12 @@ class Monster(Character):
 
     def attack_target(self, player):
         result = super().attack_target(player)
+        if result is None:
+            return None
         if not self.life:
-            return
+            return result
         if not player.life:
-            return
+            return result
 
         if result["result"] != "miss":
             self.attack_effect(player)
