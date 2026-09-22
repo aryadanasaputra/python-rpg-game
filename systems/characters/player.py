@@ -48,7 +48,6 @@ ROLE_GROWTH = {
 
 class Player(Character):
     def __init__ (self, name, role, level=1, experience=0, experience_reward=0):
-        self.name = name
         self.role = role
         self.level = level
 
