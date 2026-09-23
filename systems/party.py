@@ -64,7 +64,7 @@ class Party:
             if self.item_inventory[item] <= 0:
                 del self.item_inventory[item]
             return {
-                "success": False,
+                "success": True,
                 "messages": messages
             }
             
