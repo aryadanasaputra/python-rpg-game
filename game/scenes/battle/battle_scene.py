@@ -1,8 +1,9 @@
 import pygame # pyright: ignore[reportMissingImports]
+from game.scenes.scene import Scene
 from game.ui import Button, draw_bar, draw_battle_log, create_skill_buttons, create_item_buttons, draw_battle_result, draw_run
-from game.battle.battle_manager import BattleManager
+from game.scenes.battle.battle_manager import BattleManager
 
-class BattleScene:
+class BattleScene(Scene):
     def __init__(self, screen, party, monster):
         self.screen = screen
         self.party = party
