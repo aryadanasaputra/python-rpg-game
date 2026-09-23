@@ -1,5 +1,5 @@
 import pygame  # pyright: ignore[reportMissingImports]
-from game.battle.battle_scene import BattleScene
+from game.scenes.battle.battle_scene import BattleScene
 from systems.characters.player import Character
 from systems.characters.monster import Monster
 from systems.party import Party
@@ -38,10 +38,14 @@ class Game:
                 self.running = False
                 return
 
-            self.current_scene.handle_event(event)
-            if self.current_scene.next_scene == "exit":
+            result = self.current_scene.handle_event(event)
+            if result == "exit":
                 self.running = False
                 return
+            # elif result == "world":
+            #     self.current_scene = self.world_scene
+            elif result == "battle":
+                self.current_scene = self.battle_scene
 
     def update(self):
         self.current_scene.update()

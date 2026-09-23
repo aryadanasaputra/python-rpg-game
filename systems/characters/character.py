@@ -24,36 +24,63 @@ class Character:
     # VALIDATION
     def can_act(self):
         if not self.life:
-            return False
-        return True
+            return {
+                "success": False,
+                "messages": [f"{self.name} is already dead..."]
+            }
+        return {
+            "success": True,
+            "messages": []
+            }
 
     def can_target(self, target):
         if not target.life:
-            print(f"{target.name} is already dead... ")
-            return False
-        return True
+            return {
+                "success": False,
+                "messages": [f"{target.name} is already dead... "]
+            }
+        return {
+            "success": True,
+            "messages": []
+            }
 
     def knows_skill(self, skill):
         if skill not in self.skills:
-            print(f"{self.name} doesn't know {skill.name}.")
-            return False
-        return True
+            return {
+                "success": False,
+                "messages": [f"{self.name} doesn't know {skill.name}."]
+            }
+        return {
+            "success": True,
+            "messages": []
+            }
 
     def can_use_mana(self, skill):
         if self.mana < skill.mana_cost:
-            print(f"{self.name} doesn't have enough mana!")
-            return False
-        return True
+            return {
+                "success": False,
+                "messages": [f"{self.name} doesn't have enough mana!"]
+            }
+        return {
+            "success": True,
+            "messages": []
+            }
 
     def can_use_skill(self, skill):
-        if not self.can_act():
-            return False
-        if not self.knows_skill(skill):
-            return False
-        if not self.can_use_mana(skill):
-            return False
+        result = self.can_act()
+        if not result["success"]:
+            return result
+        result = self.knows_skill(skill)
+        if not result["success"]:
+            return result
+        result = self.can_use_mana(skill)
+        if not result["success"]:
+            return result
         
-        return True
+        return {
+            "success": True,
+            "messages": []
+            }
 
     # SKILL
     def learn_skill(self, skill):
@@ -64,12 +91,9 @@ class Character:
             return f"{self.name} already knows {skill.name}"
 
     def use_skill(self, skill, targets, effect_targets=None):
-        if not self.can_use_skill(skill):
-            return {
-                "success": False,
-                "messages": [f"{self.name} cannot use skill {skill.name}"]
-                }
-
+        result_can_use_skill = self.can_use_skill(skill)
+        if not result_can_use_skill["success"]:
+            return result_can_use_skill
         effect_targets = effect_targets if effect_targets is not None else []
         successful_targets = []
         messages = []

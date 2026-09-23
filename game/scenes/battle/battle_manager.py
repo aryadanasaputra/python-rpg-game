@@ -120,9 +120,8 @@ class BattleManager:
         result = self.player.use_skill(skill, targets, effect_targets)
         for message in result.get("messages", []):
             self.add_log(message)
-            if not result.get("success", False):
-                self.add_log(message)
-                return False
+        if not result.get("success", False):
+            return False
         if self.check_battle_result():
             return True
         self.end_player_turn()
