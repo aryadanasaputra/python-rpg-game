@@ -38,9 +38,16 @@ class BattleManager:
             self.check_battle_result()
             return
 
-        self.add_log(result["message"])
+        if not result.get("success", False):
+            for message in result.get("messages", []):
+                self.add_log(message)
+            return
 
-        status = result.get("status")
+        for message in result.get("messages", []):
+            self.add_log(message)
+
+        combat_result = result.get("combat", {})
+        status = combat_result.get("status")
         if status is not None:
             self.add_log(status)
 
@@ -81,14 +88,23 @@ class BattleManager:
 
     def player_attack(self):
         result = self.player.attack_target(self.monster)
-        if result is None:
-            return
-        self.add_log(result["message"])
-        if result.get("status") is not None:
-            self.add_log(result["status"])
+        if not result.get("success", False):
+            for message in result.get("messages", []):
+                self.add_log(message)
+            return result
+
+        for message in result.get("messages", []):
+            self.add_log(message)
+
+        combat_result = result.get("combat", {})
+        status = combat_result.get("status")
+        if status is not None:
+            self.add_log(status)
+
         if self.check_battle_result():
-            return
+            return result
         self.end_player_turn()
+        return result
 
     def use_skill(self, skill):
         targets = []
@@ -104,8 +120,9 @@ class BattleManager:
         result = self.player.use_skill(skill, targets, effect_targets)
         for message in result.get("messages", []):
             self.add_log(message)
-        if not result.get("success", False):
-            return False
+            if not result.get("success", False):
+                self.add_log(message)
+                return False
         if self.check_battle_result():
             return True
         self.end_player_turn()

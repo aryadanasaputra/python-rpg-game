@@ -65,7 +65,10 @@ class Character:
 
     def use_skill(self, skill, targets, effect_targets=None):
         if not self.can_use_skill(skill):
-            return {"success": False}
+            return {
+                "success": False,
+                "messages": [f"{self.name} cannot use skill {skill.name}"]
+                }
 
         effect_targets = effect_targets if effect_targets is not None else []
         successful_targets = []
@@ -176,7 +179,6 @@ class Character:
         return {
             "success": True,
             "messages": [
-                f"{self.name} rolls {roll}",
                 result["message"]
             ],
             "combat": result

@@ -85,7 +85,8 @@ class Monster(Character):
         if not player.life:
             return result
 
-        if result["result"] != "miss":
+        combat_result = result.get("combat", {})
+        if combat_result.get("result") != "miss":
             self.attack_effect(player)
         return result
 
