@@ -2,6 +2,7 @@ import pygame # pyright: ignore[reportMissingImports]
 from game.scenes.scene import Scene
 from game.ui import Button, draw_bar, draw_battle_log, create_skill_buttons, create_item_buttons, draw_battle_result, draw_run
 from game.scenes.battle.battle_manager import BattleManager
+from assets.fonts.font import Fonts
 
 class BattleScene(Scene):
     def __init__(self, screen, party, monster):
@@ -14,26 +15,21 @@ class BattleScene(Scene):
         # Set State Menu
         self.menu = "main"
 
-        # Set font
-        self.font_big = pygame.font.Font("assets/static/Oswald-Bold.ttf", 54)
-        self.font = pygame.font.Font(None, 36)
-        self.font_small = pygame.font.Font(None, 24)
+        self.attack_button = Button((100, 620, 150, 50), "Attack", Fonts.medium)
+        self.skill_button = Button((270, 620, 150, 50), "Skill", Fonts.medium)
+        self.item_button = Button((440, 620, 150, 50), "Item", Fonts.medium)
+        self.run_button = Button((610, 620, 150, 50), "Run", Fonts.medium)
 
-        self.attack_button = Button((100, 620, 150, 50), "Attack", self.font)
-        self.skill_button = Button((270, 620, 150, 50), "Skill", self.font)
-        self.item_button = Button((440, 620, 150, 50), "Item", self.font)
-        self.run_button = Button((610, 620, 150, 50), "Run", self.font)
-
-        self.back_button = Button((100, 620, 150, 50), "Back", self.font)
+        self.back_button = Button((100, 620, 150, 50), "Back", Fonts.medium)
         # Generate Skill Button
-        self.skill_buttons = create_skill_buttons(self.player.skills, self.font_small)
+        self.skill_buttons = create_skill_buttons(self.player.skills, Fonts.small)
         self.item_buttons = {}
 
-        self.continue_button = Button((400, 400, 200, 50), "Continue", self.font)
-        self.run_yes_button = Button((330, 400, 150, 50), "Yes", self.font)
-        self.run_no_button = Button((500, 400, 150, 50), "No", self.font)
-        self.retry_button = Button((330, 400, 150, 50), "Retry", self.font)
-        self.exit_button = Button((500, 400, 150, 50), "Exit", self.font)
+        self.continue_button = Button((400, 400, 200, 50), "Continue", Fonts.medium)
+        self.run_yes_button = Button((330, 400, 150, 50), "Yes", Fonts.medium)
+        self.run_no_button = Button((500, 400, 150, 50), "No", Fonts.medium)
+        self.retry_button = Button((330, 400, 150, 50), "Retry", Fonts.medium)
+        self.exit_button = Button((500, 400, 150, 50), "Exit", Fonts.medium)
 
         self.next_scene = None
 
@@ -59,7 +55,7 @@ class BattleScene(Scene):
         )
 
         # Text Player
-        player_text = self.font.render(
+        player_text = Fonts.medium.render(
             f"{self.player.name} (Lv.{self.player.level})", # Text yang akan muncul
             True,
             (255,255,255) # Warna
@@ -67,7 +63,7 @@ class BattleScene(Scene):
         self.screen.blit(player_text, (100, 420))
 
         # Text Monster
-        monster_text = self.font.render(
+        monster_text = Fonts.medium.render(
             f"{self.monster.name} (Lv.{self.monster.level})",
             True,
             (255,255,255)
@@ -76,13 +72,13 @@ class BattleScene(Scene):
 
         # HP Bar Player
         draw_bar(self.screen, self.player.health, self.player.max_health, 100, 570)
-        hp_text = self.font_small.render(
+        hp_text = Fonts.small.render(
             f"HP:",
             True,
             (255, 255, 255)
         )
         self.screen.blit(hp_text, (65, 567))
-        hp_count_text = self.font_small.render(
+        hp_count_text = Fonts.small.render(
             f"{self.player.health}/{self.player.max_health}",
             True,
             (255, 255, 255)
@@ -91,13 +87,13 @@ class BattleScene(Scene):
         
         # MP Bar Player
         draw_bar(self.screen, self.player.mana, self.player.max_mana, 100, 590, color=(91, 208, 243))
-        mana_text = self.font_small.render(
+        mana_text = Fonts.small.render(
             f"MP:",
             True,
             (255, 255, 255)
         )
         self.screen.blit(mana_text, (65, 587))
-        mana_count_text = self.font_small.render(
+        mana_count_text = Fonts.small.render(
             f"{self.player.mana}/{self.player.max_mana}",
             True,
             (255, 255, 255)
@@ -106,13 +102,13 @@ class BattleScene(Scene):
 
         # HP Bar Monster
         draw_bar(self.screen, self.monster.health, self.monster.max_health, 750, 270)
-        monster_hp_text = self.font.render(
+        monster_hp_text = Fonts.medium.render(
             f"HP: {self.monster.health}/{self.monster.max_health}",
             True,
             (255, 255, 255)
         )
         self.screen.blit(monster_hp_text, (750, 300))
-        draw_battle_log(self.screen, self.font_small, self.battle_manager.battle_log)
+        draw_battle_log(self.screen, Fonts.small, self.battle_manager.battle_log)
 
         if self.menu == "main":
             self.attack_button.draw(self.screen)
@@ -128,11 +124,11 @@ class BattleScene(Scene):
                 button.draw(self.screen)
             self.back_button.draw(self.screen)
         elif self.menu == "run":
-            draw_run(self.screen, self.font_big)
+            draw_run(self.screen, Fonts.big)
             self.run_yes_button.draw(self.screen)
             self.run_no_button.draw(self.screen)
 
-        turn_text = self.font.render(
+        turn_text = Fonts.medium.render(
             f"{self.battle_manager.turn.upper()} TURN",
             True,
             (255, 255, 255)
@@ -142,10 +138,10 @@ class BattleScene(Scene):
 
 
         if self.battle_manager.battle_state == "victory":
-            draw_battle_result("VICTORY", self.screen, self.font_big)
+            draw_battle_result("VICTORY", self.screen, Fonts.big)
             self.continue_button.draw(self.screen)
         elif self.battle_manager.battle_state == "defeat":
-            draw_battle_result("DEFEAT", self.screen, self.font_big, color=(255, 0, 0))
+            draw_battle_result("DEFEAT", self.screen, Fonts.big, color=(255, 0, 0))
             self.retry_button.draw(self.screen)
             self.exit_button.draw(self.screen)
 
@@ -154,7 +150,7 @@ class BattleScene(Scene):
             if self.battle_manager.battle_state == "victory":
                 if self.continue_button.is_clicked(event):
                     self.next_scene = "world"
-                    return
+                    return self.next_scene
             if self.battle_manager.battle_state == "defeat":
                 if self.retry_button.is_clicked(event):
                     self.battle_manager.retry_battle()
@@ -162,7 +158,7 @@ class BattleScene(Scene):
                     return
                 if self.exit_button.is_clicked(event):
                     self.next_scene = "exit"
-                    return
+                    return self.next_scene
         if self.battle_manager.battle_state != "playing":
             return
         
@@ -179,7 +175,7 @@ class BattleScene(Scene):
                     return
                 if self.item_button.is_clicked(event):
                     self.menu = "items"
-                    self.item_buttons = create_item_buttons(self.party.item_inventory, self.font_small)
+                    self.item_buttons = create_item_buttons(self.party.item_inventory, Fonts.small)
                     return
                 if self.run_button.is_clicked(event):
                     self.menu = "run"
