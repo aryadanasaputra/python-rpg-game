@@ -27,7 +27,6 @@ class Game:
         self.scene_manager = SceneManager()
         self.world_scene = WorldScene(self.screen, self.party)
         self.battle_scene = BattleScene(self.screen, self.party, self.monsters)
-        self.current_scene = self.battle_scene
         self.scene_manager.change_scene(self.world_scene)
 
     def run(self):
@@ -46,7 +45,7 @@ class Game:
                 self.running = False
                 return
 
-            result = self.current_scene.handle_event(event)
+            result = self.scene_manager.current_scene.handle_event(event)
             if result == "exit":
                 self.running = False
             elif result == "world":
