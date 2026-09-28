@@ -1,7 +1,7 @@
 import pygame # pyright: ignore[reportMissingImports]
 from game.scenes.scene import Scene
 from game.scenes.world.world_manager import WorldManager
-from game.ui import Button
+from game.ui import Button, draw_confirmation_panel
 from assets.fonts.font import Fonts
 
 class WorldScene(Scene):
@@ -9,14 +9,27 @@ class WorldScene(Scene):
         self.screen = screen
         self.player = player
 
+        self.world_state = "playing"
         self.world_manager = WorldManager(player)
         self.font = Fonts.medium
+        self.confirm_yes_button = Button((330, 400, 150, 50), "Yes", Fonts.medium)
+        self.confirm_no_button = Button((500, 400, 150, 50), "No", Fonts.medium)
 
     def handle_event(self, event):
+        if self.world_state == "confirm_battle":
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if self.confirm_yes_button.is_clicked(event):
+                    self.world_state = "playing"
+                    return "battle"
+                if self.confirm_no_button.is_clicked(event):
+                    self.world_state = "playing"
+                    return
+            return
+
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_e:
                 if self.world_manager.check_enemy_collision():
-                    print("Player wants to fight!")
+                    self.world_state = "confirm_battle"
         # if event.type == pygame.KEYDOWN:
         #     if event.key == pygame.K_w:
         #         self.world_manager.move_player(0, -5)
@@ -28,6 +41,8 @@ class WorldScene(Scene):
         #         self.world_manager.move_player(5, 0)
 
     def update(self):
+        if self.world_state != "playing":
+            return
         keys = pygame.key.get_pressed()
         self.world_manager.update(keys)
 
@@ -47,5 +62,10 @@ class WorldScene(Scene):
         text = Fonts.medium.render("WORLD", True, (255, 255, 255))
 
         self.screen.blit(text, (20, 20))
+
+        if self.world_state == "confirm_battle":
+            draw_confirmation_panel(self.screen, Fonts.big, "Do you want to fight this enemy?")
+            self.confirm_yes_button.draw(self.screen)
+            self.confirm_no_button.draw(self.screen)
 
         
