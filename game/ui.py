@@ -79,31 +79,6 @@ def draw_battle_result(result, screen, font, color=(255, 255, 255)):
 
     screen.blit(result_text, text_rect)
 
-def draw_run(screen, font):
-    dark_overlay = pygame.Surface(screen.get_size(), pygame.SRCALPHA)
-    dark_overlay.fill((0, 0, 0, 180))
-    screen.blit(dark_overlay, (0, 0))
-
-    panel = pygame.Surface((500, 250), pygame.SRCALPHA)
-    panel.fill((30, 30, 30, 255))
-
-    panel_rect = panel.get_rect(
-        center=screen.get_rect().center
-    )
-
-    screen.blit(panel, panel_rect)
-
-    text = font.render(
-        "Are you sure?",
-        True,
-        (255, 255, 255)
-    )
-
-    text_rect = text.get_rect(
-        center=(panel_rect.centerx, panel_rect.top + 75)
-    )
-
-    screen.blit(text, text_rect)
     
 def create_skill_buttons(skills, font):
     # Dictionary skill
@@ -126,6 +101,39 @@ def create_item_buttons(item_inventory, font):
         buttons[item] = Button((x, y, 150, 50), text, font)
         x += 170
     return buttons
+
+def draw_confirmation_panel(screen, font, text):
+    dark_overlay = pygame.Surface(screen.get_size(), pygame.SRCALPHA)
+    dark_overlay.fill((0, 0, 0, 180))
+    screen.blit(dark_overlay, (0, 0))
+
+    panel = pygame.Surface((500, 250), pygame.SRCALPHA)
+    panel.fill((30, 30, 30, 255))
+
+    dark_overlay = pygame.Surface(screen.get_size(), pygame.SRCALPHA)
+    dark_overlay.fill((0, 0, 0, 180))
+    screen.blit(dark_overlay, (0, 0))
+
+    panel = pygame.Surface((500, 250), pygame.SRCALPHA)
+    panel.fill((30, 30, 30, 255))
+
+    panel_rect = panel.get_rect(
+        center=screen.get_rect().center
+    )
+
+    screen.blit(panel, panel_rect)
+
+    text_set = font.render(
+        text,
+        True,
+        (255, 255, 255)
+    )
+
+    text_rect = text_set.get_rect(
+        center=(panel_rect.centerx, panel_rect.top + 75)
+    )
+
+    screen.blit(text_set, text_rect)
 
 class Button:
     def __init__(self, rect, text, font, background_color=(100, 100, 100), text_color=(255, 255, 255)):

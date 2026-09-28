@@ -1,6 +1,6 @@
 import pygame # pyright: ignore[reportMissingImports]
 from game.scenes.scene import Scene
-from game.ui import Button, draw_bar, draw_battle_log, create_skill_buttons, create_item_buttons, draw_battle_result, draw_run
+from game.ui import Button, draw_bar, draw_battle_log, create_skill_buttons, create_item_buttons, draw_battle_result, draw_confirmation_panel
 from game.scenes.battle.battle_manager import BattleManager
 from assets.fonts.font import Fonts
 
@@ -124,7 +124,7 @@ class BattleScene(Scene):
                 button.draw(self.screen)
             self.back_button.draw(self.screen)
         elif self.menu == "run":
-            draw_run(self.screen, Fonts.big)
+            draw_confirmation_panel(self.screen, Fonts.big, "Are You Sure?")
             self.run_yes_button.draw(self.screen)
             self.run_no_button.draw(self.screen)
 
