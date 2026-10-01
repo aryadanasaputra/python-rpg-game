@@ -5,12 +5,12 @@ from game.scenes.battle.battle_manager import BattleManager
 from assets.fonts.font import Fonts
 
 class BattleScene(Scene):
-    def __init__(self, screen, party, monster):
+    def __init__(self, screen, party):
         self.screen = screen
         self.party = party
         self.player = self.party.characters[0]
-        self.monster = monster
-        self.battle_manager = BattleManager(self.party, self.monster)
+        self.monster = None
+        self.battle_manager = BattleManager(self.party)
 
         # Set State Menu
         self.menu = "main"
@@ -205,13 +205,17 @@ class BattleScene(Scene):
                     return
             if self.menu == "run":
                 if self.run_yes_button.is_clicked(event):
-                    self.next_scene = "exit"
-                    return
+                    self.menu = "main"
+                    self.next_scene = "world"
+                    return self.next_scene
                 if self.run_no_button.is_clicked(event):
                     self.menu = "main"
                     return
-            
 
+    def start_battle(self, monster):
+        self.menu = "main"
+        self.monster = monster
+        self.battle_manager.start_battle(monster)
 
 
 
