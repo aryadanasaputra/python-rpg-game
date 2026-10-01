@@ -19,26 +19,16 @@ class WorldScene(Scene):
         if self.world_state == "confirm_battle":
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if self.confirm_yes_button.is_clicked(event):
-                    self.world_state = "playing"
                     return "battle"
                 if self.confirm_no_button.is_clicked(event):
                     self.world_state = "playing"
-                    return
+                    return "world"
             return
 
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_e:
                 if self.world_manager.check_enemy_collision():
                     self.world_state = "confirm_battle"
-        # if event.type == pygame.KEYDOWN:
-        #     if event.key == pygame.K_w:
-        #         self.world_manager.move_player(0, -5)
-        #     elif event.key == pygame.K_s:
-        #         self.world_manager.move_player(0, 5)
-        #     elif event.key == pygame.K_a:
-        #         self.world_manager.move_player(-5, 0)
-        #     elif event.key == pygame.K_d:
-        #         self.world_manager.move_player(5, 0)
 
     def update(self):
         if self.world_state != "playing":

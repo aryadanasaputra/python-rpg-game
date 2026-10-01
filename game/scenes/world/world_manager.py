@@ -12,7 +12,6 @@ class WorldManager:
     def update(self, keys):
         if keys[pygame.K_w]:
             self.player_rect.y -= self.player_speed
-            print("Player bergerak ke atas")
 
         if keys[pygame.K_s]:
             self.player_rect.y += self.player_speed
