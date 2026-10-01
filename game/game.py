@@ -28,7 +28,6 @@ class Game:
         self.world_scene = WorldScene(self.screen, self.party)
         self.battle_scene = BattleScene(self.screen, self.party, self.monsters)
         self.scene_manager.change_scene(self.world_scene)
-        self.current_scene = self.world_scene
 
     def run(self):
         while self.running:
@@ -55,9 +54,7 @@ class Game:
                 self.scene_manager.change_scene(self.battle_scene)
 
     def update(self):
-        result = self.scene_manager.current_scene.update()
-        if result == "battle":
-            self.scene_manager.change_scene(self.battle_scene)
+        self.scene_manager.current_scene.update()
 
     def draw(self):
         self.scene_manager.current_scene.draw()
