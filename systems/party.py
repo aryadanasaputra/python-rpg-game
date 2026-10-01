@@ -31,7 +31,7 @@ class Party:
             inventory[item] += 1
         else:
             inventory[item] = 1
-        print(f"Party obtained {item.name}")
+        return f"Party obtained {item.name}"
 
     def use_item(self, item, targets):
         if item not in self.item_inventory:
@@ -86,7 +86,7 @@ class Party:
 
     def add_gold(self, amount):
         self.gold += amount
-        print(f"Party obtained {amount} Gold!")
+        return f"Party obtained {amount} Gold!"
 
     def equip(self, character, item):
         if item not in self.equipment_inventory:

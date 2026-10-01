@@ -1,8 +1,8 @@
 class BattleManager:
-    def __init__(self, party, monster):
+    def __init__(self, party):
         self.party = party
         self.player = party.characters[0]
-        self.monster = monster
+        self.monster = None
         self.battle_log = []
 
         self.battle_state = "playing"
@@ -11,6 +11,12 @@ class BattleManager:
     def update(self):
         if self.turn == "monster":
             self.monster_turn()
+
+    def start_battle(self, monster):
+        self.monster = monster
+        self.battle_state = "playing"
+        self.turn = "player"
+        self.battle_log.clear()
 
     def check_battle_result(self):
         if self.battle_state != "playing":
@@ -128,8 +134,26 @@ class BattleManager:
         return True
 
     def give_reward(self):
-        reward = self.monster.experience_reward
-        return self.player.gain_experience(reward)
+        if self.monster.reward_given:
+            return []
+
+        self.monster.reward_given = True
+        messages = []
+        exp_each = self.monster.experience_reward // len(self.party.characters)
+        for character in self.party.characters:
+            messages.extend(character.gain_experience(exp_each))
+
+        messages.append(self.party.add_gold(self.monster.gold_reward))
+
+        drop_item = self.monster.get_drop()
+        if drop_item is not None:
+            item_message = self.party.add_item(drop_item)
+            if isinstance(item_message, str):
+                messages.append(item_message)
+            else:
+                messages.append(f"Could not add {drop_item.name} to the party inventory.")
+
+        return messages
 
     def retry_battle(self):
         self.player.health = self.player.max_health

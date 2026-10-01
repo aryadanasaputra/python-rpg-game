@@ -25,8 +25,8 @@ class Game:
         self.monsters = monsters
 
         self.scene_manager = SceneManager()
-        self.world_scene = WorldScene(self.screen, self.party)
-        self.battle_scene = BattleScene(self.screen, self.party, self.monsters)
+        self.world_scene = WorldScene(self.screen, self.party, self.monsters)
+        self.battle_scene = BattleScene(self.screen, self.party)
         self.scene_manager.change_scene(self.world_scene)
 
     def run(self):
@@ -50,7 +50,9 @@ class Game:
                 self.running = False
             elif result == "world":
                 self.scene_manager.change_scene(self.world_scene)
-            elif result == "battle":
+            elif result is not None and isinstance(result, tuple) and result[0] == "battle":
+                enemy = result[1]
+                self.battle_scene.start_battle(enemy)
                 self.scene_manager.change_scene(self.battle_scene)
 
     def update(self):
