@@ -5,12 +5,14 @@ from game.ui import Button, draw_confirmation_panel
 from assets.fonts.font import Fonts
 
 class WorldScene(Scene):
-    def __init__(self, screen, player):
+    def __init__(self, screen, player, enemy):
         self.screen = screen
         self.player = player
+        self.enemy = enemy
+        self.selected_enemy = None
 
         self.world_state = "playing"
-        self.world_manager = WorldManager(player)
+        self.world_manager = WorldManager(player, enemy)
         self.font = Fonts.medium
         self.confirm_yes_button = Button((330, 400, 150, 50), "Yes", Fonts.medium)
         self.confirm_no_button = Button((500, 400, 150, 50), "No", Fonts.medium)
@@ -19,8 +21,17 @@ class WorldScene(Scene):
         if self.world_state == "confirm_battle":
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if self.confirm_yes_button.is_clicked(event):
-                    return "battle"
+                    self.world_state = "playing"
+                    return ("battle", self.selected_enemy)
                 if self.confirm_no_button.is_clicked(event):
+                    self.world_state = "playing"
+                    return "world"
+
+            elif event.type == pygame.KEYDOWN:
+                if event.key in (pygame.K_q, pygame.K_GREATER):
+                    self.world_state = "playing"
+                    return ("battle", self.selected_enemy)
+                if event.key in (pygame.K_e, pygame.K_BACKSPACE):
                     self.world_state = "playing"
                     return "world"
             return
@@ -36,6 +47,10 @@ class WorldScene(Scene):
         keys = pygame.key.get_pressed()
         self.world_manager.update(keys)
 
+        enemy = self.world_manager.get_colliding_enemy()
+        if enemy is not None:
+            self.selected_enemy = enemy
+
     def draw(self):
         self.screen.fill((50, 120, 50))
 
@@ -44,11 +59,12 @@ class WorldScene(Scene):
             (50, 150, 255),
             self.world_manager.player_rect
         )
-        pygame.draw.rect(
-            self.screen,
-            (200, 50, 50),
-            self.world_manager.enemy_rect
-        )
+        if self.enemy.life:
+            pygame.draw.rect(
+                self.screen,
+                (200, 50, 50),
+                self.world_manager.enemy_rect
+            )
         text = Fonts.medium.render("WORLD", True, (255, 255, 255))
 
         self.screen.blit(text, (20, 20))
