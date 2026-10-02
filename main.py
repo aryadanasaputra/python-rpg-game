@@ -46,7 +46,7 @@ party.add_item(WOODEN_ARMOR)
 party.add_item(WOODEN_RING)
 party.add_item(GOLDEN_RING)
 
-game = Game(party, m3)
+game = Game(party, [m1, m2, m3])
 game.run()
 
 # battle = Battle(party, [m1, m2, m3])

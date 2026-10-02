@@ -37,6 +37,11 @@ class BattleScene(Scene):
     def update(self):
         self.battle_manager.update()
 
+    def start_battle(self, monster):
+        self.menu = "main"
+        self.monster = monster
+        self.battle_manager.start_battle(monster)
+    
     def draw(self):
         self.screen.fill((30, 30, 30))
         # Player
@@ -211,11 +216,6 @@ class BattleScene(Scene):
                 if self.run_no_button.is_clicked(event):
                     self.menu = "main"
                     return
-
-    def start_battle(self, monster):
-        self.menu = "main"
-        self.monster = monster
-        self.battle_manager.start_battle(monster)
 
 
 
