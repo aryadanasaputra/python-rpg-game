@@ -5,13 +5,13 @@ from game.ui import Button, draw_confirmation_panel
 from assets.fonts.font import Fonts
 
 class WorldScene(Scene):
-    def __init__(self, screen, player, monsters):
+    def __init__(self, screen, player, enemy_data):
         self.screen = screen
         self.player = player
         self.selected_enemy = None
 
         self.world_state = "playing"
-        self.world_manager = WorldManager(player, monsters)
+        self.world_manager = WorldManager(player, enemy_data)
         self.font = Fonts.medium
         self.confirm_yes_button = Button((330, 400, 150, 50), "Yes", Fonts.medium)
         self.confirm_no_button = Button((500, 400, 150, 50), "No", Fonts.medium)

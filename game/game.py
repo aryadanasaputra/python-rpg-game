@@ -9,7 +9,7 @@ from systems.party import Party
 from systems.skills.knight import WIND_SWING, RISING_SHIELD
 
 class Game:
-    def __init__(self, party, monsters):
+    def __init__(self, party, enemy_data):
         pygame.init()
 
         Fonts.initialize()
@@ -22,10 +22,10 @@ class Game:
         self.running = True
 
         self.party = party
-        self.monsters = monsters
+        self.enemy_data = enemy_data
 
         self.scene_manager = SceneManager()
-        self.world_scene = WorldScene(self.screen, self.party, self.monsters)
+        self.world_scene = WorldScene(self.screen, self.party, self.enemy_data)
         self.battle_scene = BattleScene(self.screen, self.party)
         self.scene_manager.change_scene(self.world_scene)
 

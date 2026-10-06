@@ -162,7 +162,12 @@ class BattleScene(Scene):
                     self.menu = "main"
                     return
                 if self.exit_button.is_clicked(event):
-                    self.next_scene = "exit"
+                    self.next_scene = "world"
+                    self.menu = "main"
+                    self.player.health = 1
+                    self.player.mana = self.player.mana // 2
+                    self.player.effects.clear()
+                    self.player.life = True
                     return self.next_scene
         if self.battle_manager.battle_state != "playing":
             return

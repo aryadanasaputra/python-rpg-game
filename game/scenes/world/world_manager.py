@@ -1,15 +1,14 @@
 import pygame # pyright: ignore[reportMissingImports]
+from game.scenes.world.world_enemy import WorldEnemy
 
 class WorldManager:
-    def __init__(self, player, monsters):
+    def __init__(self, player, enemy_data):
         self.player = player
-        self.monsters = monsters
         self.player_speed = 5
         self.player_rect = pygame.Rect(500, 350, 50, 50)
         self.enemies = [
-                WorldEnemy(monsters[0], 700, 300),
-                WorldEnemy(monsters[1], 300, 200),
-                WorldEnemy(monsters[2], 800, 500),
+                WorldEnemy(enemy["monster"], enemy["x"], enemy["y"])
+                for enemy in enemy_data
             ]
 
     def update(self, keys):
@@ -35,8 +34,3 @@ class WorldManager:
             if self.player_rect.colliderect(enemy.rect):
                 return enemy
         return None
-
-class WorldEnemy:
-    def __init__(self, monster, x, y):
-        self.monster = monster
-        self.rect = pygame.Rect(x, y, 50, 50)
