@@ -3,6 +3,7 @@ from game.scenes.scene import Scene
 from game.scenes.world.world_manager import WorldManager
 from game.ui import Button, draw_confirmation_panel
 from assets.fonts.font import Fonts
+from assets.colors.color import Colors
 
 class WorldScene(Scene):
     def __init__(self, screen, player, enemy_data):
@@ -48,21 +49,46 @@ class WorldScene(Scene):
         self.world_manager.update(keys)
 
     def draw(self):
-        self.screen.fill((50, 120, 50))
+        self.screen.fill(Colors.GRASS_COLOR)
+        pygame.draw.rect(
+            self.screen,
+            Colors.DARK_GRASS_COLOR,
+            (0, 0, 1000, 150)
+        )
 
         pygame.draw.rect(
             self.screen,
-            (50, 150, 255),
-            self.world_manager.player_rect
+            Colors.GRASS_COLOR,
+            (0, 500, 1000, 200)
         )
+
+        for obstacle in self.world_manager.obstacles:
+            pygame.draw.rect(
+                self.screen,
+                Colors.OBSTACLE_COLOR,
+                obstacle
+            )
+
+        for decoration in self.world_manager.decorations:
+            pygame.draw.rect(
+                self.screen,
+                Colors.DECORATION_COLOR,
+                decoration
+            )
+
         for enemy in self.world_manager.enemies:
             if not enemy.monster.life:
                 continue
             pygame.draw.rect(
                 self.screen,
-                (200, 50, 50),
+                Colors.ENEMY_COLOR,
                 enemy.rect
             )
+        pygame.draw.rect(
+            self.screen,
+            Colors.PLAYER_COLOR,
+            self.world_manager.player_rect
+        )
         text = Fonts.medium.render("WORLD", True, (255, 255, 255))
 
         self.screen.blit(text, (20, 20))
