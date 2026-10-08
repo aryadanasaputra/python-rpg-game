@@ -46,13 +46,9 @@ party.add_item(WOODEN_ARMOR)
 party.add_item(WOODEN_RING)
 party.add_item(GOLDEN_RING)
 
-enemy_data = [
-    {"monster": m1, "x": 700, "y": 300},
-    {"monster": m2, "x": 300, "y": 200},
-    {"monster": m3, "x": 800, "y": 500}
-]
+enemies = [m1, m2, m3]
 
-game = Game(party, enemy_data)
+game = Game(party, enemies)
 game.run()
 
 # battle = Battle(party, [m1, m2, m3])
