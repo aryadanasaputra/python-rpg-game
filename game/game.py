@@ -1,15 +1,13 @@
 import pygame  # pyright: ignore[reportMissingImports]
 from game.scenes.scene import SceneManager
 from game.scenes.world.world_scene import WorldScene
+from game.scenes.world.world_data import create_world_data
 from game.scenes.battle.battle_scene import BattleScene
 from assets.fonts.font import Fonts
-from systems.characters.player import Character
-from systems.characters.monster import Monster
-from systems.party import Party
 from systems.skills.knight import WIND_SWING, RISING_SHIELD
 
 class Game:
-    def __init__(self, party, enemy_data):
+    def __init__(self, party, monsters):
         pygame.init()
 
         Fonts.initialize()
@@ -22,8 +20,9 @@ class Game:
         self.running = True
 
         self.party = party
-        self.enemy_data = enemy_data
+        self.monsters = monsters
 
+        self.enemy_data = create_world_data(self.monsters)
         self.scene_manager = SceneManager()
         self.world_scene = WorldScene(self.screen, self.party, self.enemy_data)
         self.battle_scene = BattleScene(self.screen, self.party)
