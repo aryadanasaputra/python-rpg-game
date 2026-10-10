@@ -2,6 +2,7 @@ import pygame # pyright: ignore[reportMissingImports]
 from game.scenes.scene import Scene
 from game.scenes.world.world_manager import WorldManager
 from game.ui import Button, draw_confirmation_panel
+from game.animations.animation import GoldPopupAnimation
 from assets.fonts.font import Fonts
 from assets.colors.color import Colors
 
@@ -16,6 +17,7 @@ class WorldScene(Scene):
         self.font = Fonts.medium
         self.confirm_yes_button = Button((330, 400, 150, 50), "Yes", Fonts.medium)
         self.confirm_no_button = Button((500, 400, 150, 50), "No", Fonts.medium)
+        self.gold_popup_animation = GoldPopupAnimation(self.screen)
 
     def handle_event(self, event):
         if self.world_state == "confirm_battle":
@@ -89,6 +91,7 @@ class WorldScene(Scene):
             Colors.PLAYER_COLOR,
             self.world_manager.player_rect
         )
+        self.gold_popup_animation.draw(self.screen, Fonts.medium)
         text = Fonts.medium.render("WORLD", True, (255, 255, 255))
 
         self.screen.blit(text, (20, 20))

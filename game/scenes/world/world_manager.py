@@ -52,6 +52,12 @@ class WorldManager:
             if self.player_rect.colliderect(obstacle):
                 return True
         return False
+    
+    def is_colliding_enemy(self):
+        for enemy in self.enemies:
+            if self.player_rect.colliderect(enemy.rect.inflate(-10, -10)):
+                return True
+        return False
 
     # New method to check collision with decorations (not in_use yet)
     def is_colliding_decoration(self):
@@ -67,7 +73,7 @@ class WorldManager:
         return False
 
     def get_collision_checks(self):
-        return [self.is_colliding_obstacle(), self.is_colliding_decoration()]
+        return [self.is_colliding_obstacle(), self.is_colliding_decoration(), self.is_colliding_enemy()]
 
     def move_player(self, dx, dy, check_collisions):
         self.player_rect.x += dx
