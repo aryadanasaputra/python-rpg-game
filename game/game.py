@@ -47,7 +47,11 @@ class Game:
             result = self.scene_manager.current_scene.handle_event(event)
             if result == "exit":
                 self.running = False
-            elif result == "world":
+            elif result is not None and isinstance(result, tuple) and result[0] == "world" and result[1] == "victory":
+                self.scene_manager.change_scene(self.world_scene)
+                gold_earned = self.party.gold - self.battle_scene.gold_before_battle
+                self.world_scene.gold_popup_animation.show_gold_popup(gold_earned)
+            elif result is not None and isinstance(result, tuple) and result[0] == "world":
                 self.scene_manager.change_scene(self.world_scene)
             elif result is not None and isinstance(result, tuple) and result[0] == "battle":
                 enemy = result[1]

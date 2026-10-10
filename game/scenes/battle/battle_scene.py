@@ -11,6 +11,7 @@ class BattleScene(Scene):
         self.player = self.party.characters[0]
         self.monster = None
         self.battle_manager = BattleManager(self.party)
+        self.gold_before_battle = 0
 
         # Set State Menu
         self.menu = "main"
@@ -40,6 +41,7 @@ class BattleScene(Scene):
     def start_battle(self, monster):
         self.menu = "main"
         self.monster = monster
+        self.gold_before_battle = self.party.gold
         self.battle_manager.start_battle(monster)
     
     def draw(self):
@@ -155,10 +157,11 @@ class BattleScene(Scene):
             if self.battle_manager.battle_state == "victory":
                 if self.continue_button.is_clicked(event):
                     self.next_scene = "world"
-                    return self.next_scene
+                    return (self.next_scene, self.battle_manager.battle_state)
             if self.battle_manager.battle_state == "defeat":
                 if self.retry_button.is_clicked(event):
                     self.battle_manager.retry_battle()
+                    self.battle_manager.battle_state = "playing"
                     self.menu = "main"
                     return
                 if self.exit_button.is_clicked(event):
@@ -168,7 +171,7 @@ class BattleScene(Scene):
                     self.player.mana = self.player.mana // 2
                     self.player.effects.clear()
                     self.player.life = True
-                    return self.next_scene
+                    return (self.next_scene, self.battle_manager.battle_state)
         if self.battle_manager.battle_state != "playing":
             return
         
@@ -217,7 +220,7 @@ class BattleScene(Scene):
                 if self.run_yes_button.is_clicked(event):
                     self.menu = "main"
                     self.next_scene = "world"
-                    return self.next_scene
+                    return (self.next_scene, self.battle_manager.battle_state)
                 if self.run_no_button.is_clicked(event):
                     self.menu = "main"
                     return
